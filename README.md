@@ -13,7 +13,7 @@
 > -- R. Buckminster Fuller
 
 My dotfiles are currently managed with [GNU Stow]. Each top-level directory
-represents a group of configurations: 
+represents a configuration package: 
 
 * [**bash**](bash). Configuration files for the Bash shell.
 * [**git**](git). Configuration files for the Git version control system.
@@ -27,15 +27,14 @@ represents a group of configurations:
 
 ## Usage
 
-You can install (by symlinking) the configurations of a group using:
+You can install (by symlinking) the configurations of a package using:
 
 ```sh
 git clone https://github.com/0xdea/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-stow -v bash git nvim pics tmux x11
+stow -vn bash git nvim pics tmux x11 # dry run
+stow -v bash git nvim pics tmux x11 # install packages
 ```
-
-Use `-n` to just show what it _would_ install (dry run).
 
 You can update the source using git:
 
@@ -43,7 +42,7 @@ You can update the source using git:
 cd ~/.dotfiles
 git add .
 git status
-git commit -a -m "feat: nvim: update"
+git commit -am "feat: nvim: update"
 git push
 ```
 
