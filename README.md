@@ -19,6 +19,11 @@ represents a group of configurations:
 * [**nvim**](nvim). Configuration files for the [Neovim] editor.
 * [**x11**](x11). Configuration files for the X Window system.
 
+> [!WARNING]
+> Don't blindly install my dotfiles if you don't know what you're doing.
+
+## Usage
+
 You can install (by symlinking) the configurations of a group using:
 
 ```bash
@@ -38,9 +43,6 @@ git status
 git commit -a -m "feat: nvim: update"
 git push
 ```
-
-> [!WARNING]
-> Don't blindly install my dotfiles if you don't know what you're doing.
 
 [GNU Stow]: https://www.gnu.org/software/stow/
 [Neovim]: https://neovim.io/
