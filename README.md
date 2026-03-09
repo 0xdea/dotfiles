@@ -16,6 +16,7 @@ My dotfiles are currently managed with [GNU Stow]. Each top-level directory
 represents a "group" of configurations: 
 
 * [**nvim**](nvim). Configuration files for [Neovim].
+* [**x11**](x11). Configuration files for X Window.
 
 You can "install" (by symlinking) the configurations of a group using:
 
