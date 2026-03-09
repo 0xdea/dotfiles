@@ -16,6 +16,7 @@ My dotfiles are currently managed with [GNU Stow]. Each top-level directory
 represents a group of configurations: 
 
 * [**bash**](bash). Configuration files for the Bash shell.
+* [**git**](git). Configuration files for the Git version control system.
 * [**nvim**](nvim). Configuration files for the [Neovim] editor.
 * [**x11**](x11). Configuration files for the X Window system.
 
