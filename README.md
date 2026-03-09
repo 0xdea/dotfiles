@@ -17,12 +17,12 @@ represents a "group" of configs, and you can "install" (by symlinking) the
 configs of a group using:
 
 ```bash
-$ stow -Sv <group>
+stow -v <group>
 ```
 
 You can use `-n` to just show what it _would_ install (dry run).
 
-> [!WARNING]
+> [!CAUTION]
 > Don't blindly install my dotfiles if you don't know what you're doing.
 
 [GNU Stow]: https://www.gnu.org/software/stow/
