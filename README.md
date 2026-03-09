@@ -19,6 +19,7 @@ represents a group of configurations:
 * [**git**](git). Configuration files for the Git version control system.
 * [**nvim**](nvim). Configuration files for the [Neovim] editor.
 * [**pics**](pics). Some pictures for backgrounds and avatars.
+* [**tmux**](tmux). Configuration files for the [tmux] terminal multiplexer.
 * [**x11**](x11). Configuration files for X Window and the [i3] window manager.
 
 > [!WARNING]
@@ -31,7 +32,7 @@ You can install (by symlinking) the configurations of a group using:
 ```sh
 git clone https://github.com/0xdea/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-stow -v bash git nvim pics x11
+stow -v bash git nvim pics tmux x11
 ```
 
 Use `-n` to just show what it _would_ install (dry run).
@@ -53,4 +54,5 @@ git push
 
 [GNU Stow]: https://www.gnu.org/software/stow/
 [Neovim]: https://neovim.io/
+[tmux]: https://tmuxcheatsheet.com/
 [i3]: https://i3wm.org/
