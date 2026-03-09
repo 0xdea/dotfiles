@@ -19,7 +19,7 @@ represents a group of configurations:
 * [**git**](git). Configuration files for the Git version control system.
 * [**nvim**](nvim). Configuration files for the [Neovim] editor.
 * [**pics**](pics). Some pictures for backgrounds and avatars.
-* [**x11**](x11). Configuration files for the X Window system.
+* [**x11**](x11). Configuration files for X Window and the [i3] window manager.
 
 > [!WARNING]
 > You shouldn't blindly install my dotfiles unless you know what you're doing.
@@ -53,3 +53,4 @@ git push
 
 [GNU Stow]: https://www.gnu.org/software/stow/
 [Neovim]: https://neovim.io/
+[i3]: https://i3wm.org/
