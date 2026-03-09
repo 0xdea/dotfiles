@@ -26,7 +26,7 @@ represents a group of configurations:
 
 You can install (by symlinking) the configurations of a group using:
 
-```bash
+```sh
 git clone https://github.com/0xdea/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 stow -v bash nvim x11
@@ -36,7 +36,7 @@ Use `-n` to just show what it _would_ install (dry run).
 
 You can update the source using git:
 
-```bash
+```sh
 cd ~/.dotfiles
 git add .
 git status
