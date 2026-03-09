@@ -12,8 +12,8 @@
 >
 > -- R. Buckminster Fuller
 
-My dotfiles are currently managed with [GNU Stow]. Each top-level directory
-represents a configuration package: 
+My Linux and macOS dotfiles are currently managed with [GNU Stow]. Each
+top-level directory represents a configuration package: 
 
 * [**bash**](bash). Configuration files for the Bash shell.
 * [**git**](git). Configuration files for the Git version control system.
