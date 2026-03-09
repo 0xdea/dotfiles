@@ -20,7 +20,7 @@ represents a group of configurations:
 * [**x11**](x11). Configuration files for the X Window system.
 
 > [!WARNING]
-> Don't blindly install my dotfiles if you don't know what you're doing.
+> You shouldn't blindly install my dotfiles unless you know what you're doing.
 
 ## Usage
 
