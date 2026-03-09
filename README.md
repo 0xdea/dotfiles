@@ -25,4 +25,4 @@ You can use `-n` to just show what it _would_ install (dry run).
 > [!WARNING]
 > Don't blindly install my dotfiles if you don't know what you're doing.
 
-[GNU Stow]: (https://www.gnu.org/software/stow/)
+[GNU Stow]: https://www.gnu.org/software/stow/
