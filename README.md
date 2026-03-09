@@ -18,6 +18,7 @@ represents a group of configurations:
 * [**bash**](bash). Configuration files for the Bash shell.
 * [**git**](git). Configuration files for the Git version control system.
 * [**nvim**](nvim). Configuration files for the [Neovim] editor.
+* [**pics**](pics). Some pictures for backgrounds and avatars.
 * [**x11**](x11). Configuration files for the X Window system.
 
 > [!WARNING]
@@ -30,7 +31,7 @@ You can install (by symlinking) the configurations of a group using:
 ```sh
 git clone https://github.com/0xdea/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-stow -v bash git nvim x11
+stow -v bash git nvim pics x11
 ```
 
 Use `-n` to just show what it _would_ install (dry run).
