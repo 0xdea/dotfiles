@@ -1,0 +1,2 @@
+#!/bin/sh
+feh --no-fehbg --bg-fill '/home/raptor/Pictures/alita-2560x1600.jpg' 
