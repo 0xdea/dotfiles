@@ -36,7 +36,7 @@ stow -vn bash git nvim pics tmux x11 # dry run
 stow -v bash git nvim pics tmux x11 # install packages
 ```
 
-You can update the source using git:
+You can update the package source repository using git:
 
 ```sh
 cd ~/.dotfiles
