@@ -13,8 +13,11 @@
 > -- R. Buckminster Fuller
 
 My dotfiles are currently managed with [GNU Stow]. Each top-level directory
-represents a "group" of configs, and you can "install" (by symlinking) the
-configs of a group using:
+represents a "group" of configurations: 
+
+* [**nvim**](nvim). Configuration files for [Neovim].
+
+You can "install" (by symlinking) the configurations of a group using:
 
 ```bash
 stow -v <group>
@@ -26,3 +29,4 @@ You can use `-n` to just show what it _would_ install (dry run).
 > Don't blindly install my dotfiles if you don't know what you're doing.
 
 [GNU Stow]: https://www.gnu.org/software/stow/
+[Neovim]: https://neovim.io/
