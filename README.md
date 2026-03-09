@@ -15,12 +15,15 @@
 My dotfiles are currently managed with [GNU Stow]. Each top-level directory
 represents a "group" of configurations: 
 
-* [**nvim**](nvim). Configuration files for [Neovim].
-* [**x11**](x11). Configuration files for X Window.
+* [**bash**](bash). Configuration files for the Bash shell.
+* [**nvim**](nvim). Configuration files for the [Neovim] editor.
+* [**x11**](x11). Configuration files for the X Window system.
 
 You can "install" (by symlinking) the configurations of a group using:
 
 ```bash
+git clone https://github.com/0xdea/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
 stow -v <group>
 ```
 
