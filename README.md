@@ -44,5 +44,10 @@ git commit -a -m "feat: nvim: update"
 git push
 ```
 
+## See also
+
+* <https://github.com/jonhoo/configs>
+* <https://youtu.be/ycMiMDHopNc>
+
 [GNU Stow]: https://www.gnu.org/software/stow/
 [Neovim]: https://neovim.io/
