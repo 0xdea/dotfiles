@@ -13,21 +13,31 @@
 > -- R. Buckminster Fuller
 
 My dotfiles are currently managed with [GNU Stow]. Each top-level directory
-represents a "group" of configurations: 
+represents a group of configurations: 
 
 * [**bash**](bash). Configuration files for the Bash shell.
 * [**nvim**](nvim). Configuration files for the [Neovim] editor.
 * [**x11**](x11). Configuration files for the X Window system.
 
-You can "install" (by symlinking) the configurations of a group using:
+You can install (by symlinking) the configurations of a group using:
 
 ```bash
 git clone https://github.com/0xdea/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-stow -v <group>
+stow -v bash nvim x11
 ```
 
-You can use `-n` to just show what it _would_ install (dry run).
+Use `-n` to just show what it _would_ install (dry run).
+
+You can update the source using git:
+
+```bash
+cd ~/.dotfiles
+git add .
+git status
+git commit -a -m "feat: nvim: update"
+git push
+```
 
 > [!WARNING]
 > Don't blindly install my dotfiles if you don't know what you're doing.
