@@ -22,7 +22,7 @@ stow -v <group>
 
 You can use `-n` to just show what it _would_ install (dry run).
 
-> [!CAUTION]
+> [!WARNING]
 > Don't blindly install my dotfiles if you don't know what you're doing.
 
 [GNU Stow]: https://www.gnu.org/software/stow/
