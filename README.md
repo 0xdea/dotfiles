@@ -16,6 +16,7 @@ My Linux and macOS dotfiles are currently managed with [GNU Stow]. Each
 top-level directory represents a configuration package: 
 
 * [**bash**](bash). Configuration files for the Bash shell.
+* [**fish**](fish). Configuration files for the [fish] shell.
 * [**git**](git). Configuration files for the Git version control system.
 * [**iterm2**](iterm2). Configuration files for the [iTerm2] macOS terminal emulator.
 * [**nvim**](nvim). Configuration files for the [Neovim] editor.
@@ -53,6 +54,7 @@ git push
 * <https://youtu.be/ycMiMDHopNc>
 
 [GNU Stow]: https://www.gnu.org/software/stow/
+[fish]: https://fishshell.com/
 [iTerm2]: https://iterm2.com/
 [Neovim]: https://neovim.io/
 [tmux]: https://tmuxcheatsheet.com/
