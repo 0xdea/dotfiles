@@ -15,6 +15,7 @@
 My Linux and macOS dotfiles are currently managed with [GNU Stow]. Each
 top-level directory represents a configuration package: 
 
+* [**base16**](base16). Personalized color schemes based on [Tinted Theming].
 * [**bash**](bash). Configuration files for the Bash shell.
 * [**fish**](fish). Configuration files for the [fish] shell.
 * [**git**](git). Configuration files for the Git version control system.
@@ -34,8 +35,8 @@ You can install (by symlinking) the configurations of a package using:
 ```sh
 git clone https://github.com/0xdea/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-stow -vn bash git nvim tmux x11 # dry run
-stow -v bash git nvim tmux x11 # install packages
+stow -vn base16 fish git nvim tmux x11 # dry run
+stow -v base16 fish git nvim tmux x11 # install packages
 ```
 
 You can update the package source repository using git:
@@ -54,6 +55,7 @@ git push
 * <https://youtu.be/ycMiMDHopNc>
 
 [GNU Stow]: https://www.gnu.org/software/stow/
+[Tinted Theming]: https://github.com/tinted-theming
 [fish]: https://fishshell.com/
 [iTerm2]: https://iterm2.com/
 [Neovim]: https://neovim.io/

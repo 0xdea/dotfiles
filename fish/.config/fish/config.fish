@@ -14,3 +14,4 @@ fish_add_path $HOME/.local/bin
 # aliases
 alias vi "nvim"
 alias up "sudo -i"
+alias ls "eza"
