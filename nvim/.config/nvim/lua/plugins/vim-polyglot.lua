@@ -2,6 +2,6 @@ return {
 
   {
     "sheerun/vim-polyglot",
-  },
+  }
 
 }
