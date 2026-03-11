@@ -1,6 +1,10 @@
 # general settings
 set -g fish_greeting ""
 
+function fish_title
+  echo (whoami)@(hostname): (prompt_pwd)
+end
+
 fish_add_path /usr/local/bin
 fish_add_path $HOME/.cargo/bin
 fish_add_path $HOME/.local/bin
