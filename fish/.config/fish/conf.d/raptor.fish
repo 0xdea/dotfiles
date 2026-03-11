@@ -1,12 +1,9 @@
-# settings
 set -g fish_greeting ""
 
-# paths
 fish_add_path /usr/local/bin
 fish_add_path $HOME/.cargo/bin
 fish_add_path $HOME/.local/bin
 
-# aliases
 alias vi "nvim"
 alias up "sudo -i"
 alias script "set -x SCRIPT yes; command script -af"
@@ -19,6 +16,8 @@ if test (uname) = "Darwin"
 
 # Linux
 else if test (uname) = "Linux"
+
+  fish_add_path /opt/oracle
 
   alias ls "eza"
   alias fd "fdfind"
