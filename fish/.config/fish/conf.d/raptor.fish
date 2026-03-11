@@ -5,6 +5,10 @@ function fish_title
   echo (whoami)@(hostname): (prompt_pwd)
 end
 
+if type -q dircolors
+    eval (dircolors -c)
+end
+
 fish_add_path /usr/local/bin
 fish_add_path $HOME/.cargo/bin
 fish_add_path $HOME/.local/bin
@@ -24,7 +28,6 @@ else if test (uname) = "Linux"
 
   fish_add_path /opt/oracle
 
-  alias ls "eza"
   alias fd "fdfind"
   alias smbclient "smbclient -mSMB3"
   alias nat "smb-nat"
