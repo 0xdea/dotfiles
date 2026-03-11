@@ -1,3 +1,4 @@
+# general settings
 set -g fish_greeting ""
 
 fish_add_path /usr/local/bin
@@ -6,6 +7,8 @@ fish_add_path $HOME/.local/bin
 
 alias vi "nvim"
 alias up "sudo -i"
+alias smbclient "smbclient -mSMB3"
+alias nat "smb-nat"
 alias script "set -x SCRIPT yes; command script -af"
 
 # macOS
