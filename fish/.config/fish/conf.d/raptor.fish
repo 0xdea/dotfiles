@@ -5,10 +5,6 @@ function fish_title
   echo (whoami)@(hostname): (prompt_pwd)
 end
 
-if type -q dircolors
-    eval (dircolors -c)
-end
-
 fish_add_path /usr/local/bin
 fish_add_path $HOME/.cargo/bin
 fish_add_path $HOME/.local/bin
@@ -17,20 +13,24 @@ alias vi "nvim"
 alias up "sudo -i"
 alias script "set -x SCRIPT yes; command script -af"
 
-# macOS
-if test (uname) = "Darwin"
-
-  fish_add_path /opt/homebrew/bin
-  fish_add_path /opt/homebrew/sbin
-
 # Linux
-else if test (uname) = "Linux"
+if test (uname) = "Linux"
 
   fish_add_path /opt/oracle
 
   alias fd "fdfind"
   alias smbclient "smbclient -mSMB3"
   alias nat "smb-nat"
+
+  if type -q dircolors
+    eval (dircolors -c)
+  end
+
+# macOS
+else if test (uname) = "Darwin"
+
+  fish_add_path /opt/homebrew/bin
+  fish_add_path /opt/homebrew/sbin
 
 end
 
