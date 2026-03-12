@@ -24,6 +24,7 @@ top-level directory represents a configuration package:
 * [**pics**](pics). Some pictures for backgrounds and avatars.
 * [**tmux**](tmux). Configuration files for the [tmux] terminal multiplexer.
 * [**x11**](x11). Configuration files for X Window and the [i3] window manager.
+* [**zed**](zed). Configuration files for the [Zed] editor.
 
 > [!WARNING]
 > You shouldn't blindly install my dotfiles unless you know what you're doing.
@@ -61,3 +62,4 @@ git push
 [Neovim]: https://neovim.io/
 [tmux]: https://tmuxcheatsheet.com/
 [i3]: https://i3wm.org/
+[Zed]: https://zed.dev/

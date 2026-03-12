@@ -1,0 +1,69 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "indent_guides": {
+    "background_coloring": "disabled",
+    "coloring": "fixed",
+    "line_width": 1
+  },
+  "preferred_line_length": 120,
+  "soft_wrap": "preferred_line_length",
+  "terminal": {
+    "shell": {
+      "program": "fish",
+    },
+  },
+  "buffer_line_height": "comfortable",
+  "edit_predictions": {
+    "provider": "copilot",
+  },
+  "agent": {
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-5-mini",
+      "enable_thinking": false,
+    },
+    "favorite_models": [],
+    "model_parameters": [],
+  },
+  "inlay_hints": {
+    "show_value_hints": true,
+    "show_parameter_hints": true,
+    "show_type_hints": true,
+    "show_other_hints": true,
+    "show_background": false,
+    "enabled": true,
+  },
+  "ui_font_size": 17.0,
+  "buffer_font_size": 15.0,
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Monokai Pro (raptor)",
+  },
+  "languages": {
+    "TOML": {
+      "formatter": {
+        "external": {
+          "command": "taplo",
+          "arguments": ["fmt", "-"],
+        },
+      },
+    },
+    "Markdown": {
+      "formatter": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "file.md"],
+        },
+      },
+      "format_on_save": "on",
+    },
+  },
+}
