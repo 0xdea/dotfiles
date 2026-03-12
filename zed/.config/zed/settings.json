@@ -7,52 +7,56 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "git_panel": {
+    "status_style": "icon",
+    "button": true,
+  },
   "git": {
     "inline_blame": {
-      "show_commit_summary": false
-    }
+      "show_commit_summary": false,
+    },
   },
   "collaboration_panel": {
-    "button": true
+    "button": true,
   },
   "project_panel": {
-    "diagnostic_badges": false
+    "diagnostic_badges": false,
   },
   "tab_bar": {
     "show_pinned_tabs_in_separate_row": false,
-    "show_nav_history_buttons": true
+    "show_nav_history_buttons": true,
   },
   "tabs": {
     "show_diagnostics": "off",
     "file_icons": true,
-    "git_status": true
+    "git_status": true,
   },
   "title_bar": {
     "show_menus": false,
-    "show_branch_icon": false
+    "show_branch_icon": false,
   },
   "use_smartcase_search": true,
   "toolbar": {
     "code_actions": false,
     "agent_review": true,
     "selections_menu": true,
-    "breadcrumbs": true
+    "breadcrumbs": true,
   },
   "minimap": {
     "max_width_columns": 120,
-    "show": "always"
+    "show": "always",
   },
   "sticky_scroll": {
-    "enabled": false
+    "enabled": false,
   },
   "telemetry": {
     "diagnostics": false,
-    "metrics": false
+    "metrics": false,
   },
   "indent_guides": {
     "background_coloring": "disabled",
     "coloring": "fixed",
-    "line_width": 1
+    "line_width": 1,
   },
   "preferred_line_length": 120,
   "soft_wrap": "preferred_line_length",
