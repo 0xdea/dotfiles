@@ -57,6 +57,7 @@
   "preferred_line_length": 120,
   "soft_wrap": "preferred_line_length",
   "terminal": {
+    "cursor_shape": "block",
     "shell": {
       "program": "fish",
     },

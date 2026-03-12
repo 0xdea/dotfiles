@@ -23,5 +23,11 @@
     "bindings": {
       "alt-shift-f": "editor::Format"
     }
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "alt-shift-p": "pane::TogglePinTab"
+    }
   }
 ]
