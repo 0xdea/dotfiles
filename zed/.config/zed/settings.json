@@ -39,6 +39,7 @@
     "light": "Monokai Pro (raptor)",
     "dark": "Monokai Pro (raptor)",
   },
+  "icon_theme": "Colored Zed Icons Theme Dark",
   "terminal": {
     "shell": {
       "program": "fish",
