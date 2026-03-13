@@ -16,7 +16,6 @@ My Linux and macOS dotfiles are currently managed with [GNU Stow]. Each top-leve
 package:
 
 - [**base16**](base16). Personalized color schemes based on [Tinted Theming].
-- [**bash**](bash). Configuration files for the Bash shell.
 - [**fish**](fish). Configuration files for the [fish] shell.
 - [**git**](git). Configuration files for the Git version control system.
 - [**iterm2**](iterm2). Configuration files for the [iTerm2] macOS terminal emulator.
