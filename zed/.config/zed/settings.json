@@ -6,67 +6,47 @@
 // To see all of Zed's default settings without changing your
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
+
+// general configuration
 {
-  "git_panel": {
-    "status_style": "icon",
-    "button": true,
+  "theme": {
+    "mode": "system",
+    "light": "Monokai Pro (raptor)",
+    "dark": "Monokai Pro (raptor)",
   },
-  "git": {
-    "inline_blame": {
-      "show_commit_summary": false,
-    },
-  },
-  "collaboration_panel": {
-    "button": true,
-  },
-  "project_panel": {
-    "diagnostic_badges": false,
-  },
-  "tab_bar": {
-    "show_pinned_tabs_in_separate_row": false,
-    "show_nav_history_buttons": true,
+  "ui_font_size": 17.0,
+  "buffer_font_size": 15.0,
+  "buffer_font_features": {
+    "calt": false,
   },
   "tabs": {
-    "show_diagnostics": "off",
     "file_icons": true,
     "git_status": true,
   },
-  "title_bar": {
-    "show_menus": false,
-    "show_branch_icon": false,
-  },
-  "use_smartcase_search": true,
-  "toolbar": {
-    "code_actions": false,
-    "agent_review": true,
-    "selections_menu": true,
-    "breadcrumbs": true,
-  },
+  "max_tabs": 10,
   "minimap": {
-    "max_width_columns": 120,
+    "max_width_columns": 100,
     "show": "always",
-  },
-  "sticky_scroll": {
-    "enabled": false,
-  },
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false,
-  },
-  "indent_guides": {
-    "background_coloring": "disabled",
-    "coloring": "fixed",
-    "line_width": 1,
   },
   "preferred_line_length": 120,
   "soft_wrap": "preferred_line_length",
+  "use_smartcase_search": true,
+  "inlay_hints": {
+    "enabled": true,
+  },
   "terminal": {
-    "cursor_shape": "block",
     "shell": {
       "program": "fish",
     },
   },
-  "buffer_line_height": "comfortable",
+
+  // disable telemetry
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false,
+  },
+
+  // ai configuration
   "edit_predictions": {
     "provider": "copilot",
   },
@@ -79,22 +59,12 @@
     "favorite_models": [],
     "model_parameters": [],
   },
-  "inlay_hints": {
-    "show_value_hints": true,
-    "show_parameter_hints": true,
-    "show_type_hints": true,
-    "show_other_hints": true,
-    "show_background": false,
-    "enabled": true,
-  },
-  "ui_font_size": 17.0,
-  "buffer_font_size": 15.0,
-  "theme": {
-    "mode": "system",
-    "light": "Monokai Pro (raptor)",
-    "dark": "Monokai Pro (raptor)",
-  },
+
+  // language configuration
   "languages": {
+    "Rust": {
+      "preferred_line_length": 100,
+    },
     "TOML": {
       "formatter": {
         "external": {

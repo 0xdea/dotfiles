@@ -9,7 +9,25 @@
   {
     "context": "Workspace",
     "bindings": {
-      // "shift shift": "file_finder::Toggle"
+      "shift shift": "command_palette::Toggle",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl ctrl": "terminal_panel::Toggle",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "alt-shift-f": "editor::Format",
+    },
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "alt-shift-p": "pane::TogglePinTab",
     },
   },
   {
@@ -18,16 +36,4 @@
       // "j k": "vim::NormalBefore"
     },
   },
-  {
-    "context": "Editor",
-    "bindings": {
-      "alt-shift-f": "editor::Format"
-    }
-  },
-  {
-    "context": "Pane",
-    "bindings": {
-      "alt-shift-p": "pane::TogglePinTab"
-    }
-  }
 ]
