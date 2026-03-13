@@ -7,17 +7,10 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 
-// general configuration
+// general settings
 {
-  "theme": {
-    "mode": "system",
-    "light": "Monokai Pro (raptor)",
-    "dark": "Monokai Pro (raptor)",
-  },
-  "ui_font_size": 17.0,
-  "buffer_font_size": 15.0,
-  "buffer_font_features": {
-    "calt": false,
+  "git_panel": {
+    "tree_view": true,
   },
   "tabs": {
     "file_icons": true,
@@ -34,10 +27,24 @@
   "inlay_hints": {
     "enabled": true,
   },
+  "ui_font_size": 17.0,
+  "buffer_font_size": 15.0,
+  "agent_ui_font_size": 17.0,
+  "agent_buffer_font_size": 14.0,
+  "buffer_font_features": {
+    "calt": false,
+  },
+  "theme": {
+    "mode": "system",
+    "light": "Monokai Pro (raptor)",
+    "dark": "Monokai Pro (raptor)",
+  },
   "terminal": {
     "shell": {
       "program": "fish",
     },
+    "copy_on_select": true,
+    "detect_venv": "off",
   },
 
   // disable telemetry
@@ -46,7 +53,7 @@
     "metrics": false,
   },
 
-  // ai configuration
+  // ai
   "edit_predictions": {
     "provider": "copilot",
   },
@@ -60,10 +67,24 @@
     "model_parameters": [],
   },
 
-  // language configuration
+  // rust-analyzer
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "check": {
+          "command": "clippy",
+        },
+        "checkOnSave": true,
+        "cargo": { "allFeatures": true },
+        "procMacro": { "enable": true },
+      },
+    },
+  },
+
+  // languages
   "languages": {
     "Rust": {
-      "preferred_line_length": 100,
+      // "preferred_line_length": 100,
     },
     "TOML": {
       "formatter": {
