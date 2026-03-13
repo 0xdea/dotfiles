@@ -39,7 +39,14 @@ stow -vn base16 fish git nvim tmux x11 # dry run
 stow -v base16 fish git nvim tmux x11 # install packages
 ```
 
-You can update the package source repository using git:
+To uninstall a package use instead:
+
+```sh
+stow -Dvn tmux # dry run
+stow -Dv tmux # uninstall package
+```
+
+You can keep the package source repository updated using git:
 
 ```sh
 cd ~/.dotfiles
