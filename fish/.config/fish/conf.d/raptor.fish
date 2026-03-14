@@ -10,7 +10,8 @@ fish_add_path $HOME/.cargo/bin
 fish_add_path $HOME/.local/bin
 
 alias vi "nvim"
-alias up "sudo -i"
+#alias up "sudo -i"
+alias up "sudo su -"
 
 # Linux
 if test (uname) = "Linux"
