@@ -7,9 +7,9 @@
 # If the above line is not correctly displayed, fix your editor first!
 
 general {
-	      color_good     = "#a6e22e"
-	      color_bad      = "#f92672"
-	      color_degraded = "#fd971f"
+        color_good     = "#a6e22e"
+        color_bad      = "#f92672"
+        color_degraded = "#fd971f"
         colors = true
         interval = 5
 }
