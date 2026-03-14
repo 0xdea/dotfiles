@@ -32,7 +32,7 @@ else if test (uname) = "Darwin"
   fish_add_path /opt/homebrew/bin
   fish_add_path /opt/homebrew/sbin
 
-  alias script "set -x SCRIPT yes; command script -aF"
+  alias script "command script -aF"
 
 end
 
