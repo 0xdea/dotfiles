@@ -12,6 +12,8 @@
 >
 > -- R. Buckminster Fuller
 
+![](https://raw.githubusercontent.com/0xdea/dotfiles/main/pics/Pictures/zed.png)
+
 My Linux and macOS dotfiles are currently managed with [GNU Stow]. Each top-level directory represents a configuration
 package:
 
