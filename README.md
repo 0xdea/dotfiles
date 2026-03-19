@@ -12,10 +12,11 @@
 >
 > -- R. Buckminster Fuller
 
+My dotfiles for Linux and macOS.
+
 ![](https://raw.githubusercontent.com/0xdea/dotfiles/main/pics/Pictures/zed.png)
 
-My Linux and macOS dotfiles are currently managed with [GNU Stow]. Each top-level directory represents a configuration
-package:
+My dotfiles are currently managed with [GNU Stow]. Each top-level directory represents a configuration package:
 
 - [**base16**](base16). Personalized color schemes based on [Tinted Theming].
 - [**fish**](fish). Configuration files for the [fish] shell.
