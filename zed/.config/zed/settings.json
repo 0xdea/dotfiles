@@ -56,7 +56,7 @@
 
   // ai
   "edit_predictions": {
-    "provider": "zed",
+    "provider": "copilot",
   },
   "agent": {
     "default_model": {
