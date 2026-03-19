@@ -29,7 +29,7 @@ My dotfiles are currently managed with [GNU Stow]. Each top-level directory repr
 - [**zed**](zed). Configuration files for the [Zed] editor.
 
 > [!WARNING]
-> You shouldn't blindly install my dotfiles unless you know what you're doing.
+> You shouldn't blindly install dotfiles unless you know what you're doing.
 
 ## Usage
 
