@@ -7,14 +7,7 @@
       "name": "Monokai Pro (raptor)",
       "appearance": "dark",
       "style": {
-        "accents": [
-          "#FF6188",
-          "#FC9867",
-          "#FFD866",
-          "#A9DC76",
-          "#78DCE8",
-          "#AB9DF2"
-        ],
+        "accents": ["#FF6188", "#FC9867", "#FFD866", "#A9DC76", "#78DCE8", "#AB9DF2"],
         "border": "#19181A",
         "border.variant": "#FFFFFF1A",
         "border.focused": "#727072",
