@@ -31,9 +31,9 @@
     },
   },
   {
-    "context": "Editor && vim_mode == insert",
+    "context": "(!ContextEditor && !AcpThread) > (Editor && mode == full)",
     "bindings": {
-      // "j k": "vim::NormalBefore"
-    },
-  },
+      "alt-h": "editor::ToggleInlayHints"
+    }
+  }
 ]
