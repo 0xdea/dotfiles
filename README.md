@@ -20,7 +20,7 @@ My dotfiles are currently managed with [GNU Stow]. Each top-level directory repr
 
 - [**base16**](base16). Personalized color schemes based on [Tinted Theming].
 - [**fish**](fish). Configuration files for the [fish] shell.
-- [**fonts**](fonts). [JetBrains Mono] fonts.
+- [**fonts**](fonts). The free and open source [JetBrains Mono] fonts.
 - [**git**](git). Configuration files for the Git version control system.
 - [**iterm2**](iterm2). Configuration files for the [iTerm2] macOS terminal emulator.
 - [**nvim**](nvim). Configuration files for the [Neovim] editor.
