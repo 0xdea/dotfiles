@@ -20,6 +20,7 @@ My dotfiles are currently managed with [GNU Stow]. Each top-level directory repr
 
 - [**base16**](base16). Personalized color schemes based on [Tinted Theming].
 - [**fish**](fish). Configuration files for the [fish] shell.
+- [**fonts**](fonts). [JetBrains Mono] fonts.
 - [**git**](git). Configuration files for the Git version control system.
 - [**iterm2**](iterm2). Configuration files for the [iTerm2] macOS terminal emulator.
 - [**nvim**](nvim). Configuration files for the [Neovim] editor.
@@ -67,6 +68,7 @@ git push
 [GNU Stow]: https://www.gnu.org/software/stow/
 [Tinted Theming]: https://github.com/tinted-theming
 [fish]: https://fishshell.com/
+[JetBrains Mono]: https://www.jetbrains.com/lp/mono/
 [iTerm2]: https://iterm2.com/
 [Neovim]: https://neovim.io/
 [tmux]: https://tmuxcheatsheet.com/
