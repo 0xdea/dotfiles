@@ -27,6 +27,7 @@
   "inlay_hints": {
     "enabled": true,
   },
+  "semantic_tokens": "combined",
   "ui_font_family": ".ZedSans",
   "ui_font_size": 17.0,
   "buffer_font_family": ".ZedMono",
