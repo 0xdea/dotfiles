@@ -76,6 +76,9 @@
   "lsp": {
     "rust-analyzer": {
       "initialization_options": {
+        "rustfmt": {
+          "extraArgs": ["--config", "imports_granularity=Module,group_imports=StdExternalCrate"],
+        },
         "check": {
           "command": "clippy",
         },
