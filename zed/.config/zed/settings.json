@@ -36,8 +36,8 @@
   "buffer_font_features": {
     "calt": false,
   },
-  "agent_ui_font_size": 17.0,
-  "agent_buffer_font_size": 14.0,
+  "agent_ui_font_size": 18.0,
+  "agent_buffer_font_size": 15.0,
   "theme": {
     "mode": "system",
     "light": "Monokai Pro (raptor)",
@@ -63,6 +63,7 @@
     "provider": "copilot",
   },
   "agent": {
+    "default_profile": "ask",
     "default_model": {
       "provider": "copilot_chat",
       "model": "gpt-5-mini",
