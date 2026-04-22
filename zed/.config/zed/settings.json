@@ -7,11 +7,8 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 
-// general settings
 {
-  "git_panel": {
-    "tree_view": true,
-  },
+  // general settings
   "tabs": {
     "file_icons": true,
     "git_status": true,
@@ -52,10 +49,19 @@
     "detect_venv": "off",
   },
 
-  // disable telemetry
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false,
+  // panels
+  "project_panel": {
+    "dock": "left",
+  },
+  "outline_panel": {
+    "dock": "left",
+  },
+  "collaboration_panel": {
+    "dock": "left",
+  },
+  "git_panel": {
+    "dock": "left",
+    "tree_view": true,
   },
 
   // ai
@@ -63,6 +69,8 @@
     "provider": "copilot",
   },
   "agent": {
+    "sidebar_side": "right",
+    "dock": "right",
     "default_profile": "ask",
     "default_model": {
       "provider": "copilot_chat",
@@ -71,6 +79,12 @@
     },
     "favorite_models": [],
     "model_parameters": [],
+  },
+
+  // disable telemetry
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false,
   },
 
   // rust-analyzer
