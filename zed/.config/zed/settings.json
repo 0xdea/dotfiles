@@ -40,6 +40,7 @@
     "light": "Monokai Pro (raptor)",
     "dark": "Monokai Pro (raptor)",
   },
+  // "colorize_brackets": true,
   "icon_theme": "Colored Zed Icons Theme Dark",
   "terminal": {
     "shell": {
