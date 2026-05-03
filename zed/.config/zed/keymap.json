@@ -10,11 +10,6 @@
     "context": "Workspace",
     "bindings": {
       "shift shift": "command_palette::Toggle",
-    },
-  },
-  {
-    "context": "Workspace",
-    "bindings": {
       "ctrl ctrl": "terminal_panel::Toggle",
     },
   },
@@ -22,6 +17,7 @@
     "context": "Editor",
     "bindings": {
       "alt-shift-f": "editor::Format",
+      "cmd-alt-c": "editor::CopyFileLocation",
     },
   },
   {
@@ -33,7 +29,7 @@
   {
     "context": "(!ContextEditor && !AcpThread) > (Editor && mode == full)",
     "bindings": {
-      "alt-h": "editor::ToggleInlayHints"
-    }
-  }
+      "alt-h": "editor::ToggleInlayHints",
+    },
+  },
 ]

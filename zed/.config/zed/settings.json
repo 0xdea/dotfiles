@@ -19,7 +19,7 @@
     "show": "always",
   },
   "preferred_line_length": 120,
-  "soft_wrap": "preferred_line_length",
+  "soft_wrap": "bounded",
   "use_smartcase_search": true,
   "inlay_hints": {
     "enabled": true,
