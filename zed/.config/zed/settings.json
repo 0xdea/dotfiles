@@ -13,7 +13,7 @@
     "file_icons": true,
     "git_status": true,
   },
-  "max_tabs": 10,
+  "max_tabs": 12,
   "minimap": {
     "max_width_columns": 100,
     "show": "always",
@@ -108,6 +108,20 @@
         "procMacro": { "enable": true },
       },
     },
+  },
+
+  // zed-highlight extension colors
+  "global_lsp_settings": {
+    "semantic_token_rules": [
+      { "token_type": "highlight-0", "foreground_color": "#F5B041", "background_color": "#F5B04150" },
+      { "token_type": "highlight-1", "foreground_color": "#85C1E9", "background_color": "#85C1E950" },
+      { "token_type": "highlight-2", "foreground_color": "#CD6155", "background_color": "#CD615550" },
+      { "token_type": "highlight-3", "foreground_color": "#AF7AC5", "background_color": "#AF7AC550" },
+      { "token_type": "highlight-4", "foreground_color": "#48C9B0", "background_color": "#48C9B050" },
+      { "token_type": "highlight-5", "foreground_color": "#F4D03F", "background_color": "#F4D03F50" },
+      { "token_type": "highlight-6", "foreground_color": "#52BE80", "background_color": "#52BE8050" },
+      { "token_type": "highlight-7", "foreground_color": "#FF9933", "background_color": "#FF993350" },
+    ],
   },
 
   // languages
