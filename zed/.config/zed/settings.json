@@ -42,6 +42,7 @@
   },
   // "colorize_brackets": true,
   "icon_theme": "Colored Zed Icons Theme Dark",
+  "autosave": "on_focus_change",
   "cli_default_open_behavior": "new_window",
   "terminal": {
     "shell": {
@@ -54,6 +55,8 @@
   // panels
   "project_panel": {
     "dock": "left",
+    "diagnostic_badges": true,
+    "git_status_indicator": true,
   },
   "outline_panel": {
     "dock": "left",
@@ -64,11 +67,13 @@
   "git_panel": {
     "dock": "left",
     "tree_view": true,
+    "sort_by_path": true,
   },
 
   // ai
   "edit_predictions": {
     "provider": "copilot",
+    "allow_data_collection": "no",
   },
   "agent": {
     "sidebar_side": "right",
