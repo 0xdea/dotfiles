@@ -115,7 +115,7 @@
     },
   },
 
-  // zed-highlight extension colors
+  // zed-highlight extension colors (dark themes)
   "global_lsp_settings": {
     "semantic_token_rules": [
       { "token_type": "zed-highlight-0", "foreground_color": "#F5B041", "background_color": "#F5B04150" },
