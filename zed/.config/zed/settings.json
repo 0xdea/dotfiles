@@ -25,6 +25,7 @@
     "enabled": true,
   },
   "semantic_tokens": "combined",
+  // "colorize_brackets": true,
   "ui_font_family": ".ZedSans",
   "ui_font_size": 17.0,
   "buffer_font_family": ".ZedMono",
@@ -35,13 +36,6 @@
   },
   "agent_ui_font_size": 18.0,
   "agent_buffer_font_size": 15.0,
-  "theme": {
-    "mode": "system",
-    "light": "Monokai Pro (raptor)",
-    "dark": "Monokai Pro (raptor)",
-  },
-  // "colorize_brackets": true,
-  "icon_theme": "Colored Zed Icons Theme Dark",
   "autosave": "on_focus_change",
   "cli_default_open_behavior": "new_window",
   "terminal": {
@@ -51,6 +45,19 @@
     "copy_on_select": true,
     "detect_venv": "off",
   },
+
+  // extensions
+  "auto_install_extensions": {
+    "colored-zed-icons-theme": true,
+    "html": true,
+    "toml": true,
+  },
+  "theme": {
+    "mode": "system",
+    "light": "Monokai Pro (raptor)",
+    "dark": "Monokai Pro (raptor)",
+  },
+  "icon_theme": "Colored Zed Icons Theme Dark",
 
   // panels
   "project_panel": {
