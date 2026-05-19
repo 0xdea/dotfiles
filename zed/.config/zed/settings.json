@@ -87,15 +87,30 @@
     "dock": "right",
     "default_profile": "ask",
     "default_model": {
-      // "provider": "copilot_chat",
-      // "model": "gpt-5-mini",
-      // "enable_thinking": false,
       "effort": "high",
       "provider": "anthropic",
       "model": "claude-opus-4-7-latest",
       "enable_thinking": true,
     },
-    "favorite_models": [],
+    "favorite_models": [
+      {
+        "provider": "copilot_chat",
+        "model": "gpt-5-mini",
+        "enable_thinking": true,
+        "effort": "high",
+      },
+      {
+        "provider": "anthropic",
+        "model": "claude-opus-4-7-latest",
+        "enable_thinking": true,
+        "effort": "high",
+      },
+      {
+        "provider": "lmstudio",
+        "model": "qwen3.6-35b-a3b",
+        "enable_thinking": false,
+      },
+    ],
     "model_parameters": [],
   },
 
