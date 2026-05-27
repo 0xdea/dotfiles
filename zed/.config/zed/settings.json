@@ -89,7 +89,7 @@
     "default_model": {
       "effort": "high",
       "provider": "anthropic",
-      "model": "claude-opus-4-7-latest",
+      "model": "claude-opus-4-7",
       "enable_thinking": true,
     },
     "favorite_models": [
@@ -101,7 +101,7 @@
       },
       {
         "provider": "anthropic",
-        "model": "claude-opus-4-7-latest",
+        "model": "claude-opus-4-7",
         "enable_thinking": true,
         "effort": "high",
       },
