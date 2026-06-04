@@ -24,6 +24,7 @@
   "inlay_hints": {
     "enabled": true,
   },
+  "auto_signature_help": true,
   "semantic_tokens": "combined",
   // "colorize_brackets": true,
   "ui_font_family": ".ZedSans",
