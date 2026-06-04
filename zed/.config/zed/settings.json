@@ -88,10 +88,10 @@
     "dock": "right",
     "default_profile": "ask",
     "default_model": {
-      "effort": "high",
       "provider": "anthropic",
       "model": "claude-opus-4-8",
       "enable_thinking": true,
+      "effort": "high",
     },
     "favorite_models": [
       {
@@ -106,10 +106,14 @@
         "enable_thinking": true,
         "effort": "high",
       },
-      // Qwen3.6 35B A3B UD IQ3_S seems to hit the sweet spot for my MacBook Air M3 24GB
       {
         "provider": "lmstudio",
-        "model": "qwen3.6-35b-a3b",
+        "model": "qwen3.6-35b-a3b", // Qwen3.6 35B A3B UD IQ3_S seems to hit the sweet spot for my MacBook Air M3 24GB
+        "enable_thinking": false,
+      },
+      {
+        "provider": "lmstudio",
+        "model": "google/gemma-4-12b", // Gemma4 12B Q8_0 is also a good option
         "enable_thinking": false,
       },
     ],
