@@ -20,6 +20,7 @@
   },
   "preferred_line_length": 120,
   "soft_wrap": "bounded",
+  "diff_view_style": "split",
   "use_smartcase_search": true,
   "inlay_hints": {
     "enabled": true,
