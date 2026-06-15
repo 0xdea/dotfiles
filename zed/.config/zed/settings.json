@@ -81,7 +81,7 @@
 
   // ai
   "edit_predictions": {
-    "provider": "copilot",
+    "provider": "zed",
     "allow_data_collection": "no",
   },
   "agent": {
