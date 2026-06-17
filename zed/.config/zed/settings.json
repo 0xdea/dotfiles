@@ -121,6 +121,19 @@
     "model_parameters": [],
   },
 
+  // remote projects
+  "ssh_connections": [
+    {
+      "host": "ubuntu.machine",
+      "args": [],
+      "projects": [
+        {
+          "paths": ["/home/raptor"],
+        },
+      ],
+    },
+  ],
+
   // disable telemetry
   "telemetry": {
     "diagnostics": false,

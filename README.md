@@ -19,6 +19,7 @@ My dotfiles for Linux and macOS.
 My dotfiles are currently managed with [GNU Stow]. Each top-level directory represents a configuration package:
 
 - [**base16**](base16). Personalized color schemes based on [Tinted Theming].
+- [**container**](container). Configuration files for Apple [container] machines.
 - [**fish**](fish). Configuration files for the [fish] shell.
 - [**fonts**](fonts). The free and open source [JetBrains Mono] fonts.
 - [**git**](git). Configuration files for the Git version control system.
@@ -67,6 +68,7 @@ git push
 
 [GNU Stow]: https://www.gnu.org/software/stow/
 [Tinted Theming]: https://github.com/tinted-theming
+[container]: https://github.com/apple/container
 [fish]: https://fishshell.com/
 [JetBrains Mono]: https://www.jetbrains.com/lp/mono/
 [iTerm2]: https://iterm2.com/
