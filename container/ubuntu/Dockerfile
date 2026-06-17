@@ -1,6 +1,18 @@
 #
 # Dockerfile to quickly setup an Apple container machine.
 #
+# Setup instructions:
+# ```sh
+# brew install container
+# container system start
+# container build -t local/ubuntu -f Dockerfile
+# container machine create local/ubuntu --set-default --name ubuntu
+# container machine run -n ubuntu
+# # run rust-setup.sh script in the vm
+# sudo container system dns create machine
+# ssh ubuntu.machine
+# ```
+#
 # See also:
 # - https://github.com/apple/container
 # - https://rkiselenko.dev/blog/development-on-mac-with-acm/
