@@ -28,6 +28,11 @@
   "inlay_hints": {
     "enabled": true,
   },
+  "diagnostics": {
+    "inline": {
+      "enabled": true,
+    },
+  },
   "auto_signature_help": true,
   "semantic_tokens": "combined",
   // "colorize_brackets": true,
@@ -79,7 +84,6 @@
   "git_panel": {
     "dock": "left",
     "tree_view": true,
-    "sort_by_path": true,
   },
 
   // ai
@@ -90,10 +94,10 @@
   "agent": {
     "sidebar_side": "right",
     "dock": "right",
-    "default_profile": "ask",
+    "default_profile": "write",
     "default_model": {
       "provider": "anthropic",
-      "model": "claude-opus-4-8",
+      "model": "claude-sonnet-5",
       "enable_thinking": true,
       "effort": "high",
     },
@@ -132,6 +136,16 @@
       "projects": [
         {
           "paths": ["/home/raptor"],
+        },
+      ],
+    },
+    {
+      "host": "192.168.190.132",
+      "username": "raptor",
+      "args": [],
+      "projects": [
+        {
+          "paths": ["/home/raptor/ttyinject-rs"],
         },
       ],
     },
