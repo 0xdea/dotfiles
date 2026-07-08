@@ -127,6 +127,11 @@
     ],
     "model_parameters": [],
   },
+  "agent_servers": {
+    "claude-acp": {
+      "type": "registry",
+    },
+  },
 
   // remote projects
   "ssh_connections": [

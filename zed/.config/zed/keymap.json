@@ -32,4 +32,10 @@
       "alt-h": "editor::ToggleInlayHints",
     },
   },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "shift-enter": ["terminal::SendText", "\u001b\r"],
+    },
+  },
 ]
