@@ -48,6 +48,11 @@
   "agent_buffer_font_size": 15.0,
   "autosave": "on_focus_change",
   "cli_default_open_behavior": "new_window",
+  "git": {
+    "inline_blame": {
+      "location": "status_bar"
+    }
+  },
   "terminal": {
     "shell": {
       "program": "fish",
@@ -205,6 +210,7 @@
           "arguments": ["fmt", "-"],
         },
       },
+      "format_on_save": "on",
     },
     "Markdown": {
       "formatter": {
