@@ -1,10 +1,10 @@
 {
   "$schema": "https://zed.dev/schema/themes/v0.2.0.json",
-  "name": "Monokai Pro (raptor)",
-  "author": "Erik Brüggemann, Marco Ivaldi",
+  "name": "Monokaiju",
+  "author": "Marco Ivaldi, Erik Brüggemann",
   "themes": [
     {
-      "name": "Monokai Pro (raptor)",
+      "name": "Monokaiju",
       "appearance": "dark",
       "style": {
         "accents": ["#FF6188", "#FC9867", "#FFD866", "#A9DC76", "#78DCE8", "#AB9DF2"],
