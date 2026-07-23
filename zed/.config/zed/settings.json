@@ -152,16 +152,6 @@
         },
       ],
     },
-    {
-      "host": "192.168.190.132",
-      "username": "raptor",
-      "args": [],
-      "projects": [
-        {
-          "paths": ["/home/raptor/ttyinject-rs"],
-        },
-      ],
-    },
   ],
 
   // disable telemetry
