@@ -99,6 +99,7 @@
   "agent": {
     "sidebar_side": "right",
     "dock": "right",
+    "limit_content_width": false,
     "default_profile": "write",
     "default_model": {
       "provider": "anthropic",
