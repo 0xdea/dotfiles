@@ -47,11 +47,12 @@
   "agent_ui_font_size": 18.0,
   "agent_buffer_font_size": 15.0,
   "autosave": "on_focus_change",
+  "format_on_save": "modifications_if_available",
   "cli_default_open_behavior": "new_window",
   "git": {
     "inline_blame": {
-      "location": "status_bar"
-    }
+      "location": "status_bar",
+    },
   },
   "terminal": {
     "shell": {
@@ -136,7 +137,7 @@
   "agent_servers": {
     "claude-acp": {
       "default_config_options": {
-        "model": "default"
+        "model": "default",
       },
       "type": "registry",
     },

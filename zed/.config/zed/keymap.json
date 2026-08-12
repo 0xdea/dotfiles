@@ -38,4 +38,14 @@
       "shift-enter": ["terminal::SendText", "\u001b\r"],
     },
   },
+  {
+    "context": "AgentPanel > Editor",
+    "bindings": {
+      "alt-up": "agent::ScrollOutputToPreviousMessage",
+      "alt-down": "agent::ScrollOutputToNextMessage",
+
+      "alt-shift-up": "agent::ScrollOutputToTop",
+      "alt-shift-down": "agent::ScrollOutputToBottom",
+    },
+  },
 ]
