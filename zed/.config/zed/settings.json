@@ -163,6 +163,47 @@
     "metrics": false,
   },
 
+  // profiles
+  "profiles": {
+    // focus mode (see also the "cmd-k cmd-k" key binding)
+    "Focus": {
+      "settings": {
+        "buffer_font_size": 18.0,
+        "tab_bar": {
+          "show": false,
+          "show_nav_history_buttons": false,
+        },
+        "toolbar": {
+          "breadcrumbs": false,
+          "quick_actions": false,
+        },
+        "gutter": {
+          "line_numbers": false,
+          "folds": false,
+          "breakpoints": false,
+          "runnables": false,
+          "min_line_number_digits": 0,
+        },
+        "minimap": {
+          "show": "never",
+        },
+        "indent_guides": {
+          "enabled": false,
+        },
+        "soft_wrap": "editor_width",
+        "current_line_highlight": "none",
+        "scrollbar": {
+          "show": "never",
+          "cursors": false,
+          "git_diff": false,
+          "diagnostics": "none",
+          "search_results": false,
+          "selected_symbol": false,
+        },
+      },
+    },
+  },
+
   // rust-analyzer
   "lsp": {
     "rust-analyzer": {

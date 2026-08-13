@@ -9,41 +9,51 @@
   {
     "context": "Workspace",
     "bindings": {
+      // jetbrains-style key bindings
       "shift shift": "command_palette::Toggle",
       "ctrl ctrl": "terminal_panel::Toggle",
-    },
-  },
-  {
-    "context": "Editor",
-    "bindings": {
-      "alt-shift-f": "editor::Format",
-      "cmd-alt-c": "editor::CopyFileLocation",
+      // sequence example for zen mode (see also "workspace::ToggleZoom" activated with "shift-esc")
+      "cmd-k cmd-k": ["action::Sequence", ["workspace::CloseAllDocks", "workspace::ToggleCenteredLayout"]],
     },
   },
   {
     "context": "Pane",
     "bindings": {
+      // pin/upin the current tab
       "alt-shift-p": "pane::TogglePinTab",
+      // launch project search in a new tab
+      "cmd-shift-f": "workspace::NewSearch",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      // format the current document
+      "alt-shift-f": "editor::Format",
+      // copy the current file location
+      "cmd-alt-c": "editor::CopyFileLocation",
     },
   },
   {
     "context": "(!ContextEditor && !AcpThread) > (Editor && mode == full)",
     "bindings": {
+      // display/hide inlay hints
       "alt-h": "editor::ToggleInlayHints",
     },
   },
   {
     "context": "Terminal",
     "bindings": {
+      // send carriage return to the terminal
       "shift-enter": ["terminal::SendText", "\u001b\r"],
     },
   },
   {
     "context": "AgentPanel > Editor",
     "bindings": {
+      // conveniency key bindings to navigate agent chats
       "alt-up": "agent::ScrollOutputToPreviousMessage",
       "alt-down": "agent::ScrollOutputToNextMessage",
-
       "alt-shift-up": "agent::ScrollOutputToTop",
       "alt-shift-down": "agent::ScrollOutputToBottom",
     },
