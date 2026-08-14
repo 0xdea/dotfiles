@@ -55,6 +55,11 @@
       "location": "status_bar",
     },
   },
+  "command_aliases": {
+    "os": "zed::OpenSettings",
+    "tc": "workspace::ToggleCenteredLayout",
+    "tsd": "editor::ToggleSplitDiff",
+  },
   "terminal": {
     "shell": {
       "program": "fish",
