@@ -263,5 +263,13 @@
       },
       "format_on_save": "on",
     },
+    "Assembly": {
+      "formatter": {
+        "external": {
+          "command": "asmfmt",
+        },
+      },
+      "format_on_save": "on",
+    },
   },
 }
