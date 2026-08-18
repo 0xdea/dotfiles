@@ -34,6 +34,7 @@ else if test (uname) = "Darwin"
   fish_add_path /opt/homebrew/sbin
 
   alias script "command script -aF"
+  alias ida "/Applications/IDA\ Professional\ 9.4.app/Contents/MacOS/ida"
 
 end
 

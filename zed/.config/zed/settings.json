@@ -271,5 +271,13 @@
       },
       "format_on_save": "on",
     },
+    "Shell Script": {
+      "formatter": {
+        "external": {
+          "command": "shfmt",
+        },
+      },
+      "format_on_save": "on",
+    },
   },
 }
