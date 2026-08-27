@@ -32,6 +32,8 @@
       "alt-shift-f": "editor::Format",
       // copy the current file location
       "cmd-alt-c": "editor::CopyFileLocation",
+      // multicursor: add a cursor at the end of each line
+      "cmd-s l": "editor::SplitSelectionIntoLines",
     },
   },
   {
