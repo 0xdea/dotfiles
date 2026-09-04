@@ -142,9 +142,6 @@
   },
   "agent_servers": {
     "claude-acp": {
-      "default_config_options": {
-        "model": "default",
-      },
       "type": "registry",
     },
   },
@@ -157,6 +154,15 @@
       "projects": [
         {
           "paths": ["/home/raptor"],
+        },
+      ],
+    },
+    {
+      "host": "192.168.190.141",
+      "args": [],
+      "projects": [
+        {
+          "paths": ["/home/raptor/singsing-rs"],
         },
       ],
     },
