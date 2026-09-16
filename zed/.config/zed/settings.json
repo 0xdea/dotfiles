@@ -21,7 +21,7 @@
     "max_width_columns": 100,
     "show": "always",
   },
-  "preferred_line_length": 120,
+  "preferred_line_length": 128,
   "soft_wrap": "bounded",
   "diff_view_style": "split",
   "use_smartcase_search": true,
