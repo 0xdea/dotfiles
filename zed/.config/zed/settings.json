@@ -36,9 +36,7 @@
   "auto_signature_help": true,
   "semantic_tokens": "combined",
   // "colorize_brackets": true,
-  "ui_font_family": ".ZedSans",
   "ui_font_size": 17.0,
-  "buffer_font_family": ".ZedMono",
   // "buffer_font_family": "JetBrains Mono",
   "buffer_font_size": 15.0,
   "buffer_font_features": {
@@ -168,6 +166,9 @@
       "projects": [
         {
           "paths": ["/home/raptor/singsing-rs"],
+        },
+        {
+          "paths": ["/home/raptor/tzompantli"],
         },
       ],
     },
