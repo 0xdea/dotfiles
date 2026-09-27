@@ -252,8 +252,9 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 - `CHANGELOG.md` follows Keep a Changelog: entries under `[Unreleased]` in `Added`/`Changed`/`Fixed`/`Removed`/
   `Security`, one short imperative sentence each ("Optimize ...", "Refactor ...", "Update ..."), with code names in
   backticks (C-RELNOTES).
-- `Cargo.toml` includes full metadata: authors, description, license, homepage, documentation, repository,
-  keywords, categories (C-METADATA).
+- `Cargo.toml` includes full metadata: authors, description, license, homepage, repository, keywords, categories
+  (C-METADATA). `documentation` is optional: crates.io links to the crate's docs.rs page by default, so set it only
+  when that default is not suitable (e.g., docs hosted elsewhere).
 
 ## Tests
 
