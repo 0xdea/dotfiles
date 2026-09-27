@@ -230,6 +230,12 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
   `env!("CARGO_BIN_NAME")`/`CARGO_PKG_VERSION`/`CARGO_PKG_AUTHORS` constants, `env::args_os()` parsing with a
   `(Some(arg), None)` match and `-h`/`--help` handling, `main() -> ExitCode`, and a `usage(prog) -> ExitCode`
   that prints usage and returns `ExitCode::FAILURE`.
+- Hand-rolled `env::args_os()` parsing is only for a CLI as simple as augur's (a fixed set of positional
+  arguments and nothing else). Anything more complex (named options/flags, optional values, defaults, value
+  validation) uses `clap` with the derive API (see singsing-rs's `zucchini`): a `#[derive(Parser)]` struct with a
+  doc comment on every field, validation pushed into clap (`value_parser!`, `FromStr` newtypes, typed fields such
+  as `NonZeroU64`) rather than checked afterward, and the same banner constants, `main() -> ExitCode`, and
+  stdout/stderr split as the augur template.
 - Results go to stdout (`println!`); everything else (banner, progress, summary, timing, errors) goes to stderr
   (`eprintln!`).
 - Message prefixes: `[*]` progress, `[+]` success/summary, `[-]` information, `[!]` warning/error. Report errors as
