@@ -126,6 +126,11 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   once, so that an invalid value can't be built in the first place. Keep a field private behind an accessor only when
   it guards an invariant the type system can't express, or when the representation may change (C-STRUCT-PRIVATE).
   `pub(crate)` is acceptable internally.
+- Encode an invariant in a type only when the excluded value is genuinely invalid (zero bandwidth, port zero), not
+  merely unusual (a zero timeout can be meaningful); a CLI may still narrow the accepted range. Once encoded, it
+  must hold on every path: a check that only a parser performs, while a `pub` field accepts anything, is a hole.
+  Write validated literals as compile-time-checked consts (`const HTTPS: NonZeroU16 = NonZeroU16::new(443).unwrap();`,
+  allowed by clippy's default `allow-unwrap-in-consts`), including in doc examples, rather than a runtime `unwrap`.
 - Types eagerly derive common traits (C-COMMON-TRAITS): small enums are `Debug, Copy, Clone, PartialEq, Eq` (and
   `Ord`/`Hash` when useful) and are passed by value. All public types implement `Debug` (C-DEBUG). Keep derives in
   alphabetical order.
@@ -150,7 +155,6 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
 - Enum variants in alphabetical order only when their order means nothing. When the order carries meaning
   (priority, severity, log level, state machine, FFI), keep the meaningful order and never alphabetize it just to
   satisfy xorpse's `sorted_enum_variants` lint (e.g., `Priority { High, Medium, Low }` stays as is).
-- Every field and variant has a doc comment.
 
 ## Error handling
 
@@ -202,6 +206,9 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
   (`shadow_unrelated` stays enabled).
 - Don't use sentinel values to force a code path (e.g., passing `BADADDR` to get `None`); express the `Option`
   flow directly with `and_then`.
+- At OS/FFI boundaries, check how the dependency converts values rather than assuming: e.g., a `Duration` timeout
+  passed as `SO_RCVTIMEO` is truncated to microseconds, and a zero timeout blocks forever. Clamp or stop early so
+  a truncated or zero value can never reach the call.
 
 ## Performance
 
@@ -210,8 +217,8 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
   allocate a `String` per iteration just to compare a prefix).
 - Prefer a single lookup (`HashMap<String, Priority>`) over several sequential ones.
 - Linear scans over tiny collections (a handful of ranges) beat hashing or sorting.
-- Measure before claiming speedups; on small inputs, IDA auto-analysis dominates runtime, so report
-  micro-optimizations honestly as code-quality improvements.
+- Measure before claiming speedups; report micro-optimizations that fixed costs dominate honestly as code-quality
+  improvements.
 
 ## idalib and FFI
 
@@ -223,19 +230,19 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 - Handle `.plt` thunk indirection for ELF binaries, and skip `FunctionFlags::THUNK` functions where appropriate.
 - Annotations (bookmarks, comments) must be idempotent: check before adding.
 - Stop on Hex-Rays license errors, but tolerate per-function decompilation failures.
+- IDA-dependent integration tests use a custom harness (`harness = false`) because IDA is not thread-safe and CI
+  has no IDA (on small inputs, auto-analysis dominates their runtime); CI only compiles them
+  (`cargo test --no-run`). They clean up any `.i64` and temporary files.
 
 ## CLI and output conventions
 
-- `main.rs` follows the augur template: banner (`{PROGRAM} {VERSION} - ...` and copyright with `{AUTHORS}`) from
-  `env!("CARGO_BIN_NAME")`/`CARGO_PKG_VERSION`/`CARGO_PKG_AUTHORS` constants, `env::args_os()` parsing with a
-  `(Some(arg), None)` match and `-h`/`--help` handling, `main() -> ExitCode`, and a `usage(prog) -> ExitCode`
-  that prints usage and returns `ExitCode::FAILURE`.
-- Hand-rolled `env::args_os()` parsing is only for a CLI as simple as augur's (a fixed set of positional
-  arguments and nothing else). Anything more complex (named options/flags, optional values, defaults, value
-  validation) uses `clap` with the derive API (see singsing-rs's `zucchini`): a `#[derive(Parser)]` struct with a
-  doc comment on every field, validation pushed into clap (`value_parser!`, `FromStr` newtypes, typed fields such
-  as `NonZeroU64`) rather than checked afterward, and the same banner constants, `main() -> ExitCode`, and
-  stdout/stderr split as the augur template.
+- Every `main.rs` has a banner (`{PROGRAM} {VERSION} - ...` and copyright with `{AUTHORS}`) from
+  `env!("CARGO_BIN_NAME")`/`CARGO_PKG_VERSION`/`CARGO_PKG_AUTHORS` constants, and `main() -> ExitCode`.
+- Argument parsing: a CLI as simple as augur's (fixed positional arguments only) follows its template, with
+  `env::args_os()`, a `(Some(arg), None)` match, `-h`/`--help` handling, and a `usage(prog) -> ExitCode` returning
+  `ExitCode::FAILURE`. Anything more complex uses `clap` derive (see singsing-rs's `zucchini`), with validation
+  pushed into clap (`value_parser!`, `FromStr` newtypes, typed fields such as `NonZeroU64`) rather than checked
+  afterward.
 - Results go to stdout (`println!`); everything else (banner, progress, summary, timing, errors) goes to stderr
   (`eprintln!`).
 - Message prefixes: `[*]` progress, `[+]` success/summary, `[-]` information, `[!]` warning/error. Report errors as
@@ -251,11 +258,9 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 - Doc comments describe behavior, parameters by name in backticks, and return values; add `# Errors` (and
   `# Panics`/`# Safety` when relevant) sections (C-FAILURE). Use intra-doc links (`[`Type`]`, `[`Type::method`]`)
   (C-LINK).
-- Comments are full sentences ending with a period, explain _why_ rather than _what_, and stay sparse: prefer
-  self-explanatory code. Keep doc comments accurate when code changes.
-- Limit non-doc comments to where they are needed to explain _why_ rather than _what_.
+- Comments are full sentences ending with a period; non-doc comments appear only where needed to explain _why_
+  rather than _what_: prefer self-explanatory code. Keep doc comments accurate when code changes.
 - `unsafe` blocks need a `// Safety:` comment (e.g., `env::set_var` in a single-threaded test binary).
-- Keep the project `CLAUDE.md` in sync with the code after every change.
 - `CHANGELOG.md` follows Keep a Changelog: entries under `[Unreleased]` in `Added`/`Changed`/`Fixed`/`Removed`/
   `Security`, one short imperative sentence each ("Optimize ...", "Refactor ...", "Update ..."), with code names in
   backticks (C-RELNOTES).
@@ -268,8 +273,9 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 - Unit tests live in `#[cfg(test)] mod tests` with `use super::*;`, return `Result` where useful, and carry
   `#[expect(clippy::panic_in_result_fn, reason = "panics are allowed in test code")]` at module level.
 - Test names describe the behavior (`copy_to_creates_missing_output_directory`). Every assertion has a message.
-- IDA-dependent integration tests use a custom harness (`harness = false`) because IDA is not thread-safe and CI
-  has no IDA; CI only compiles them (`cargo test --no-run`). They clean up any `.i64` and temporary files.
+- Extract time-dependent decisions out of I/O loops into pure functions that take `now: Instant` as a parameter
+  (e.g., singsing-rs's `receive_wait`), so every edge case is unit-testable without real clocks, sockets, or
+  privileges.
 - File-system tests use per-test temp directories under `env::temp_dir()`, scoped by label and process ID.
 
 ## Collaboration
