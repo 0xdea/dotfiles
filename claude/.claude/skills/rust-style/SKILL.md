@@ -252,8 +252,9 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 
 ## Documentation and comments
 
-- Every item has a doc comment (`missing_docs` is on), including private ones. The one exception is a binary's
-  `fn main()`, which needs no doc comment. Crate docs include the README:
+- Every item has a doc comment (`missing_docs` is on), including private ones. The exceptions are a binary's
+  `fn main()` and unit test functions (`#[test]`), whose descriptive names already document them; helper
+  functions in test modules still get a doc comment. Crate docs include the README:
   `#![cfg_attr(doc, doc = include_str!("../README.md"))]`.
 - Doc comments describe behavior, parameters by name in backticks, and return values; add `# Errors` (and
   `# Panics`/`# Safety` when relevant) sections (C-FAILURE). Use intra-doc links (`[`Type`]`, `[`Type::method`]`)
