@@ -1,6 +1,6 @@
 ---
 name: rust-style
-description: raptor's Rust style guide (idiomatic Rust, performance, docs, lints, CLI/output conventions, idalib/FFI rules). Use whenever writing, reviewing, or refactoring Rust code in any of raptor's projects (rhabdomancer, augur, haruspex, idalib, zed-highlight, singsing-rs, etc.) or starting a new one.
+description: raptor's Rust style guide. Use whenever writing, reviewing, or refactoring Rust code in any projects or starting a new one.
 ---
 
 # Rust style guide
@@ -11,8 +11,9 @@ Sources: [idalib-rust-style](https://github.com/idalib-rs/idalib/blob/master/ski
 these representative projects:
 [augur](https://github.com/0xdea/augur), [rhabdomancer](https://github.com/0xdea/rhabdomancer),
 [haruspex](https://github.com/0xdea/haruspex), [idalib](https://github.com/idalib-rs/idalib),
-[zed-highlight](https://github.com/0xdea/zed-highlight), and [singsing-rs](https://github.com/0xdea/singsing-rs). When unsure
-how something is usually done, look at how these projects do it (local clones may exist under `~/RustroverProjects/`).
+[zed-highlight](https://github.com/0xdea/zed-highlight), and [singsing-rs](https://github.com/0xdea/singsing-rs).
+When unsure how something is usually done, look at how these projects do it (local clones may exist under
+`~/RustroverProjects/`).
 
 ## New projects
 
@@ -72,7 +73,7 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   ```sh
   cargo fmt --all --check
   cargo clippy --all-targets --locked -- -D warnings
-  RUSTDOCFLAGS="-D warnings" cargo doc --locked
+  RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --locked
   cargo test --locked   # or the project's custom harness, e.g. `cargo test --test tests --locked`
   ```
 - Optional extra checks: `cargo fmt -- --config imports_granularity=Module,group_imports=StdExternalCrate` and
@@ -81,7 +82,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
 
 ## Imports
 
-- Three groups separated by a blank line: 1) `std`/`core`/`alloc`, 2) external crates, 3) `crate::`/`self::`/`super::`.
+- Three groups separated by a blank line: 1) `std`/`core`/`alloc`, 2) external crates,
+  3) `crate::`/`self::`/`super::`.
 - Group sibling leaf items only; never nest multi-segment paths inside braces, and never repeat the same prefix:
   ```rust
   use std::collections::{BTreeMap, HashSet};
@@ -137,7 +139,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
 - Use `#[non_exhaustive]` on public enums that may grow, and on public structs with `pub` fields that may gain more
   fields (adding a field would otherwise break struct literals and exhaustive destructuring in other crates; since
   other crates then can't build the struct with a literal, provide a constructor). Use `#[must_use]` on pure
-  functions whose result matters, and `const fn` wherever possible.
+  functions whose result matters, private ones included (clippy only flags public ones), and `const fn` wherever
+  possible.
 - Functions with a clear receiver are methods (C-METHOD). Constructors are static inherent methods (C-CTOR).
 - Return values instead of taking out-parameters (C-NO-OUT): a traversal returns `Result<usize, _>` rather than
   incrementing a `&mut usize`. Don't store state in a struct field just to return it once.
@@ -182,7 +185,10 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
   style (`[!] Error: {err:#}`).
 - Never silently ignore errors. When an error is deliberately ignored (best-effort work), say so in a comment and
   match the ignored variants explicitly rather than using `_` for everything.
-- Use `inspect_err` for cleanup-on-failure, and report (don't propagate) a failure during cleanup.
+- Use `inspect_err` for cleanup-on-failure, and report (don't propagate) a failure during cleanup. Cleanup must
+  never delete pre-existing data: create the output directory before, and outside, the path the cleanup covers.
+- Use `Result<Option<T>, E>` to separate fatal errors from an expected absence (like `Child::try_wait`), rather
+  than an error that callers must classify.
 - Use `anyhow::ensure!` for precondition checks.
 
 ## Expressions and idioms
@@ -206,9 +212,10 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
   (`shadow_unrelated` stays enabled).
 - Don't use sentinel values to force a code path (e.g., passing `BADADDR` to get `None`); express the `Option`
   flow directly with `and_then`.
-- At OS/FFI boundaries, check how the dependency converts values rather than assuming: e.g., a `Duration` timeout
-  passed as `SO_RCVTIMEO` is truncated to microseconds, and a zero timeout blocks forever. Clamp or stop early so
-  a truncated or zero value can never reach the call.
+- At OS/FFI and dependency boundaries, read what the dependency actually does rather than assuming: e.g., a
+  `Duration` timeout passed as `SO_RCVTIMEO` is truncated to microseconds, and a zero timeout blocks forever
+  (clamp or stop early so such values never reach the call); haruspex's `decompile_to_file` returns `Ok(())` even
+  when the `.h` file wasn't written.
 
 ## Performance
 
@@ -224,7 +231,13 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 
 - Types whose methods call FFI on an IDB or derived objects must be bound to the IDB lifetime
   (`struct Foo<'a> { _marker: PhantomData<&'a IDB> }` or by holding `Function<'a>`, etc.).
-- Call `idalib::force_batch_mode()` before opening any database.
+- Call `idalib::force_batch_mode()` before opening any database, including in test harnesses.
+- `decompile()` always passes `DECOMP_NO_CACHE`, so each call is a full decompilation: decompile each function at
+  most once per run, caching results and failures (e.g., augur's `DumpCache`).
+- Some operations only queue work for auto-analysis (e.g., decompiling can create strings): call `idb.auto_wait()`
+  before reading the results. `IDB::open` with auto-analysis already waits.
+- Names from the analyzed binary (strings, function names) are untrusted: sanitize them into a single path
+  component before building file names, and unit-test path traversal.
 - Cache FFI results that can't change during a run as plain data, not borrowed wrappers: e.g., `.plt` segments as
   `Vec<Range<Address>>`. IDA's `range_t` is half-open (`end_ea` excluded), exactly like `Range::contains`.
 - Handle `.plt` thunk indirection for ELF binaries, and skip `FunctionFlags::THUNK` functions where appropriate.
@@ -274,6 +287,7 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 - Unit tests live in `#[cfg(test)] mod tests` with `use super::*;`, return `Result` where useful, and carry
   `#[expect(clippy::panic_in_result_fn, reason = "panics are allowed in test code")]` at module level.
 - Test names describe the behavior (`copy_to_creates_missing_output_directory`). Every assertion has a message.
+- Prove a new regression test can fail: temporarily break the behavior it guards, check that it fails, restore.
 - Extract time-dependent decisions out of I/O loops into pure functions that take `now: Instant` as a parameter
   (e.g., singsing-rs's `receive_wait`), so every edge case is unit-testable without real clocks, sockets, or
   privileges.
