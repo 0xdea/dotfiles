@@ -35,8 +35,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
 2. **When in doubt, ask the user.** If it's unclear which idiom is current, or a newer idiom conflicts with a rule
    below, a project's `CLAUDE.md`, or its lint configuration, explain the options and ask instead of guessing.
 3. **Then the project, then this guide.** Otherwise, the project's `CLAUDE.md` and `Cargo.toml` lint configuration
-   win over this guide. Clippy with the project's lints is the minimum bar: if code passes
-   `cargo clippy --all-targets --locked -- -D warnings` but violates a rule below, still fix it.
+   win over this guide. Clippy with the project's lints is the minimum bar: if code passes the Tooling checks but
+   violates a rule below, still fix it.
 
 ## Tooling
 
@@ -65,20 +65,25 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   ```
   If a project is missing an entry from this list, point it out rather than silently adding it.
 - Suppress a lint locally with `#[expect(clippy::lint_name, reason = "...")]`, never `#[allow]`, and only when it
-  genuinely cannot be avoided. Prefer restructuring code so the `#[expect]` is not needed (e.g., `saturating_add`
-  instead of `+=` with `#[expect(clippy::arithmetic_side_effects)]`).
+  genuinely cannot be avoided. Prefer restructuring code so the `#[expect]` is not needed (for arithmetic, see
+  Expressions and idioms). Put the `#[expect]` on the narrowest item that needs it (e.g., the single `use` item),
+  not on the whole crate. Clippy skips some lints in test builds (e.g., `wildcard_imports`), which leaves a plain
+  `#[expect]` unfulfilled under `--all-targets`; use `#[cfg_attr(not(test), expect(...))]` for those.
 - A lint that fights idiomatic code everywhere (e.g., `pattern_type_mismatch` vs default binding modes) belongs
   in the `Cargo.toml` allow list, not in scattered `#[expect]`s.
 - Always pass `--locked` to cargo commands that support it. Before declaring work done, run:
   ```sh
   cargo fmt --all --check
-  cargo clippy --all-targets --locked -- -D warnings
-  RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --locked
-  cargo test --locked   # or the project's custom harness, e.g. `cargo test --test tests --locked`
+  cargo clippy --workspace --all-targets --locked -- -D warnings
+  RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
+  cargo test --workspace --locked   # or the project's custom harness, e.g. `cargo test --test tests --locked`
   ```
+  Keep `--workspace` (in a non-virtual workspace, omitting it silently skips every crate but the root), and also
+  run any extra CI steps (e.g., a WASM target build).
 - Optional extra checks: `cargo fmt -- --config imports_granularity=Module,group_imports=StdExternalCrate` and
   `cargo dylint --git https://github.com/xorpse/rust-style --pattern '*'` (install with
   `cargo install cargo-dylint dylint-link`).
+- Dependabot cargo updates stay ungrouped.
 
 ## Imports
 
@@ -108,7 +113,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
 ## Naming
 
 - No single-character identifiers (`clippy::min_ident_chars`): `name`, `func`, `idx`, `addr`, `segm`, `err`, not
-  `s`, `f`, `i`, `a`. Single-char lifetimes (`'a`) are fine.
+  `s`, `f`, `a`, `e`. Clippy's default exemptions (`i`, `j`, `n`, `w`, `x`, `y`, `z`) are fine, and so are
+  single-char lifetimes (`'a`).
 - Casing per RFC 430 (C-CASE). Use consistent word order across the codebase (C-WORD-ORDER).
 - Getters have no `get_` prefix: `timeout()`, `set_timeout()`, builder-style `with_timeout()` delegating to the
   setter (C-GETTER). Conversions follow `as_` (cheap borrow), `to_` (expensive), `into_` (consuming) (C-CONV).
@@ -137,8 +143,7 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   `Ord`/`Hash` when useful) and are passed by value. All public types implement `Debug` (C-DEBUG). Keep derives in
   alphabetical order.
 - Use `#[non_exhaustive]` on public enums that may grow, and on public structs with `pub` fields that may gain more
-  fields (adding a field would otherwise break struct literals and exhaustive destructuring in other crates; since
-  other crates then can't build the struct with a literal, provide a constructor). Use `#[must_use]` on pure
+  fields (then provide a constructor, since other crates can't use a struct literal). Use `#[must_use]` on pure
   functions whose result matters, private ones included (clippy only flags public ones), and `const fn` wherever
   possible.
 - Functions with a clear receiver are methods (C-METHOD). Constructors are static inherent methods (C-CTOR).
@@ -174,15 +179,14 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
       source: io::Error,
   },
   ```
-  Use `#[error(transparent)]` only when the variant adds nothing to the wrapped error, e.g. it wraps another error
-  type of the same crate that already fully describes the failure (as in singsing-rs's `ScanError::Incomplete`,
-  which wraps `IncompleteScanError`). Use `#[from]` only when a single, unambiguous conversion makes `?`
-  convenient; it implies `#[source]`, and several variants can't all use `#[from]` for the same source type.
-- Error messages are always lowercase unless they start with a proper noun or acronym (`"no type definitions
-generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages, `anyhow` context strings
-  (`.context("failed to load known bad API function names")`), `anyhow::ensure!`/`bail!` messages, and
-  `IDAError::ffi_with` messages. User-facing `eprintln!` output lines are not error messages and keep their prefix
-  style (`[!] Error: {err:#}`).
+  Use `#[error(transparent)]` only when the variant adds nothing, e.g. it wraps a same-crate error that already
+  describes the failure (singsing-rs's `ScanError::Incomplete`). Use `#[from]` only for a single, unambiguous
+  conversion.
+- Error messages are always lowercase unless they start with a proper noun or acronym
+  (`"no type definitions generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages, `anyhow`
+  context strings (`.context("failed to load known bad API function names")`), `anyhow::ensure!`/`bail!` messages,
+  and `IDAError::ffi_with` messages. User-facing `eprintln!` output lines are not error messages and keep their
+  prefix style (`[!] Error: {err:#}`).
 - Never silently ignore errors. When an error is deliberately ignored (best-effort work), say so in a comment and
   match the ignored variants explicitly rather than using `_` for everything.
 - Use `inspect_err` for cleanup-on-failure, and report (don't propagate) a failure during cleanup. Cleanup must
@@ -204,12 +208,16 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 - Walk linked chains with `iter::successors(first, Next::next)` (e.g., XREF chains with `XRef::next_to`) instead of
   manual `while let` loops. Use an explicit `Vec` work stack instead of recursion for unbounded depth.
 - Use the `Entry` API instead of `contains_key` + `insert`.
-- Counters use `saturating_add` (or `checked_*` when overflow is an error), not bare arithmetic.
+- Arithmetic: prefer code that needs none, then `saturating_*` for counters, then `checked_*` when overflow is an
+  error. When an operation provably cannot overflow, keep it bare under `#[expect(clippy::arithmetic_side_effects)]`
+  with a `reason` saying why (e.g., "`end` is at most `line.len()`") rather than `checked_*` + `?`, which would turn
+  a future bug into a silent `None`.
+- Don't add fallbacks for cases an earlier check rules out (e.g., `.filter(|word| !word.is_empty())` after a check
+  that guarantees a non-empty match); state the guarantee in a comment instead.
 - Shadow a variable for a clear transformation of the same value instead of inventing a new name: conversions
   (`let filepath = filepath.as_ref();`), parsing and trimming (`let port = port.trim().parse::<u16>()?;`), wrapping
-  (`let path = PathBuf::from(path);`), or changing mutability (`let mut buf = buf;`). `shadow_reuse` and
-  `shadow_same` are in the baseline allow list for this reason. Never reuse a name for an unrelated value
-  (`shadow_unrelated` stays enabled).
+  (`let path = PathBuf::from(path);`), or changing mutability (`let mut buf = buf;`). Never reuse a name for an
+  unrelated value (`shadow_unrelated` stays enabled).
 - Don't use sentinel values to force a code path (e.g., passing `BADADDR` to get `None`); express the `Option`
   flow directly with `and_then`.
 - At OS/FFI and dependency boundaries, read what the dependency actually does rather than assuming: e.g., a
@@ -224,28 +232,13 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
   allocate a `String` per iteration just to compare a prefix).
 - Prefer a single lookup (`HashMap<String, Priority>`) over several sequential ones.
 - Linear scans over tiny collections (a handful of ranges) beat hashing or sorting.
-- Measure before claiming speedups; report micro-optimizations that fixed costs dominate honestly as code-quality
-  improvements.
+- Measure before claiming a speedup or no regression: style refactors of hot code can rescan input or compare more
+  fields. Check behavior with a differential test against the old version, judge regressions against what users can
+  notice, and report micro-optimizations that fixed costs dominate honestly as code-quality improvements.
 
 ## idalib and FFI
 
-- Types whose methods call FFI on an IDB or derived objects must be bound to the IDB lifetime
-  (`struct Foo<'a> { _marker: PhantomData<&'a IDB> }` or by holding `Function<'a>`, etc.).
-- Call `idalib::force_batch_mode()` before opening any database, including in test harnesses.
-- `decompile()` always passes `DECOMP_NO_CACHE`, so each call is a full decompilation: decompile each function at
-  most once per run, caching results and failures (e.g., augur's `DumpCache`).
-- Some operations only queue work for auto-analysis (e.g., decompiling can create strings): call `idb.auto_wait()`
-  before reading the results. `IDB::open` with auto-analysis already waits.
-- Names from the analyzed binary (strings, function names) are untrusted: sanitize them into a single path
-  component before building file names, and unit-test path traversal.
-- Cache FFI results that can't change during a run as plain data, not borrowed wrappers: e.g., `.plt` segments as
-  `Vec<Range<Address>>`. IDA's `range_t` is half-open (`end_ea` excluded), exactly like `Range::contains`.
-- Handle `.plt` thunk indirection for ELF binaries, and skip `FunctionFlags::THUNK` functions where appropriate.
-- Annotations (bookmarks, comments) must be idempotent: check before adding.
-- Stop on Hex-Rays license errors, but tolerate per-function decompilation failures.
-- IDA-dependent integration tests use a custom harness (`harness = false`) because IDA is not thread-safe and CI
-  has no IDA (on small inputs, auto-analysis dominates their runtime); CI only compiles them
-  (`cargo test --no-run`). They clean up any `.i64` and temporary files.
+For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), also read [idalib.md](idalib.md).
 
 ## CLI and output conventions
 
@@ -273,7 +266,9 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
   `# Panics`/`# Safety` when relevant) sections (C-FAILURE). Use intra-doc links (`[`Type`]`, `[`Type::method`]`)
   (C-LINK).
 - Comments are full sentences ending with a period; non-doc comments appear only where needed to explain _why_
-  rather than _what_: prefer self-explanatory code. Keep doc comments accurate when code changes.
+  rather than _what_: prefer self-explanatory code. Keep doc comments accurate when code changes. A comment that
+  justifies something (e.g., why ignoring an error is safe) must hold on every path that reaches the code, not
+  just the common one; check each caller before writing it.
 - `unsafe` blocks need a `// Safety:` comment (e.g., `env::set_var` in a single-threaded test binary).
 - `CHANGELOG.md` follows Keep a Changelog: entries under `[Unreleased]` in `Added`/`Changed`/`Fixed`/`Removed`/
   `Security`, one short imperative sentence each ("Optimize ...", "Refactor ...", "Update ..."), with code names in
@@ -299,4 +294,3 @@ generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages,
 - Never `git commit` (or push); the user reviews and commits.
 - After a change: run the checks above, update `CLAUDE.md` and `CHANGELOG.md` when relevant, and summarize what
   changed and how it was verified.
-- Dependabot cargo updates stay ungrouped.
