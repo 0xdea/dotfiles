@@ -25,9 +25,17 @@ cargo install cargo-generate
 cargo generate --git https://github.com/0xdea/raptor-rust-template
 ```
 
-Precedence: the project's `CLAUDE.md` and `Cargo.toml` lint configuration win over this guide. Clippy with the
-project's lints is the ground truth: if code passes `cargo clippy --all-targets --locked -- -D warnings` but
-violates a rule below, still fix it; if a rule below conflicts with a lint, follow the lint and mention the conflict.
+## Precedence
+
+1. **Current idiomatic Rust comes first.** The code must stay as idiomatic as possible and current with the latest
+   stable Rust release and edition. The rules below, the sources above, and existing project code capture idioms as
+   they were when written; when any of them conflicts with a newer idiom (a new std API, language feature, edition
+   change, or updated community consensus), prefer the current idiom and point out the outdated rule or code.
+2. **When in doubt, ask the user.** If it's unclear which idiom is current, or a newer idiom conflicts with a rule
+   below, a project's `CLAUDE.md`, or its lint configuration, explain the options and ask instead of guessing.
+3. **Then the project, then this guide.** Otherwise, the project's `CLAUDE.md` and `Cargo.toml` lint configuration
+   win over this guide. Clippy with the project's lints is the minimum bar: if code passes
+   `cargo clippy --all-targets --locked -- -D warnings` but violates a rule below, still fix it.
 
 ## Tooling
 
