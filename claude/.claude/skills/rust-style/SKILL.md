@@ -141,7 +141,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   allowed by clippy's default `allow-unwrap-in-consts`), including in doc examples, rather than a runtime `unwrap`.
 - Types eagerly derive common traits (C-COMMON-TRAITS): small enums are `Debug, Copy, Clone, PartialEq, Eq` (and
   `Ord`/`Hash` when useful) and are passed by value. All public types implement `Debug` (C-DEBUG). Keep derives in
-  alphabetical order.
+  alphabetical order. Derive `Default` (and drop a hand-written `new()` that only builds defaults) when every field
+  has a suitable default; clippy's `new_without_default` only flags public types.
 - Use `#[non_exhaustive]` on public enums that may grow, and on public structs with `pub` fields that may gain more
   fields (then provide a constructor, since other crates can't use a struct literal). Use `#[must_use]` on pure
   functions whose result matters, private ones included (clippy only flags public ones), and `const fn` wherever
@@ -232,6 +233,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   allocate a `String` per iteration just to compare a prefix).
 - Prefer a single lookup (`HashMap<String, Priority>`) over several sequential ones.
 - Linear scans over tiny collections (a handful of ranges) beat hashing or sorting.
+- Under a lock, only snapshot what you need (clone `Arc`s, copy `Copy` values) and release it before scanning or
+  I/O; keep a check followed by a mutation under a single lock.
 - Measure before claiming a speedup or no regression: style refactors of hot code can rescan input or compare more
   fields. Check behavior with a differential test against the old version, judge regressions against what users can
   notice, and report micro-optimizations that fixed costs dominate honestly as code-quality improvements.
@@ -283,6 +286,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   `#[expect(clippy::panic_in_result_fn, reason = "panics are allowed in test code")]` at module level.
 - Test names describe the behavior (`copy_to_creates_missing_output_directory`). Every assertion has a message.
 - Prove a new regression test can fail: temporarily break the behavior it guards, check that it fails, restore.
+- Tests that pin an external contract (wire names, file formats, CLI output) use literal values, not the production
+  constants, so an accidental change to a constant fails the test.
 - Extract time-dependent decisions out of I/O loops into pure functions that take `now: Instant` as a parameter
   (e.g., singsing-rs's `receive_wait`), so every edge case is unit-testable without real clocks, sockets, or
   privileges.
@@ -291,6 +296,9 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 ## Collaboration
 
 - Explain the plan for each change and wait for approval before implementing it.
+- Weigh a fix's complexity against how often its inputs occur in the tool's domain: prefer the simplest fix that
+  covers realistic inputs, document the remaining limitation and pin it with a test, and keep a more complete
+  alternative on a branch if it might be wanted later.
 - Never `git commit` (or push); the user reviews and commits.
 - After a change: run the checks above, update `CLAUDE.md` and `CHANGELOG.md` when relevant, and summarize what
   changed and how it was verified.
