@@ -68,7 +68,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   genuinely cannot be avoided. Prefer restructuring code so the `#[expect]` is not needed (for arithmetic, see
   Expressions and idioms). Put the `#[expect]` on the narrowest item that needs it (e.g., the single `use` item),
   not on the whole crate. Clippy skips some lints in test builds (e.g., `wildcard_imports`), which leaves a plain
-  `#[expect]` unfulfilled under `--all-targets`; use `#[cfg_attr(not(test), expect(...))]` for those.
+  `#[expect]` unfulfilled under `--all-targets`; use `#[cfg_attr(not(test), expect(...))]` for those. The `reason`
+  must say why the lint is harmless at every site it covers; recheck it whenever the code under it changes.
 - A lint that fights idiomatic code everywhere (e.g., `pattern_type_mismatch` vs default binding modes) belongs
   in the `Cargo.toml` allow list, not in scattered `#[expect]`s.
 - Always pass `--locked` to cargo commands that support it. Before declaring work done, run:
