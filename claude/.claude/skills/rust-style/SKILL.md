@@ -251,7 +251,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   `env::args_os()`, a `(Some(arg), None)` match, `-h`/`--help` handling, and a `usage(prog) -> ExitCode` returning
   `ExitCode::FAILURE`. Anything more complex uses `clap` derive (see singsing-rs's `zucchini`), with validation
   pushed into clap (`value_parser!`, `FromStr` newtypes, typed fields such as `NonZeroU64`) rather than checked
-  afterward.
+  afterward. Defaults are typed too: `default_value_t = DEFAULT_BANDWIDTH_KIB` (a checked const), not a
+  `default_value = "15"` string that clap only parses at runtime.
 - Results go to stdout (`println!`); everything else (banner, progress, summary, timing, errors) goes to stderr
   (`eprintln!`).
 - Message prefixes: `[*]` progress, `[+]` success/summary, `[-]` information, `[!]` warning/error. Report errors as
