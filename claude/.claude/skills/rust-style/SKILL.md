@@ -1,6 +1,6 @@
 ---
 name: rust-style
-description: raptor's Rust style guide. Use whenever writing, reviewing, or refactoring Rust code in any projects or starting a new one.
+description: raptor's Rust style guide. Use whenever writing, reviewing, or refactoring Rust code.
 ---
 
 # Rust style guide
@@ -44,37 +44,16 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
 ## Tooling
 
 - Every project uses workspace lints with all clippy groups enabled (`all`, `pedantic`, `nursery`, `cargo`,
-  `restriction`) plus a short, curated allow list. Keep new projects in line with augur's `[workspace.lints]` block.
-  The baseline clippy allow list, wanted in every project:
-  ```toml
-  blanket_clippy_restriction_lints = "allow"
-  std_instead_of_core = "allow"
-  std_instead_of_alloc = "allow"
-  arbitrary_source_item_ordering = "allow"
-  implicit_return = "allow"
-  question_mark_used = "allow"
-  pattern_type_mismatch = "allow"
-  shadow_reuse = "allow"
-  shadow_same = "allow"
-  print_stdout = "allow"
-  print_stderr = "allow"
-  single_char_lifetime_names = "allow"
-  impl_trait_in_params = "allow"
-  missing_inline_in_public_items = "allow"
-  inline_modules = "allow"
-  single_call_fn = "allow"
-  separated_literal_suffix = "allow"
-  default_numeric_fallback = "allow"
-  ```
-  If a project is missing an entry from this list, point it out rather than silently adding it.
+  `restriction`) plus the curated baseline allow list in [lints.md](lints.md), in line with augur's
+  `[workspace.lints]` block. If a project is missing an entry from that list, point it out rather than silently
+  adding it.
 - Suppress a lint locally with `#[expect(clippy::lint_name, reason = "...")]`, never `#[allow]`, and only when it
   genuinely cannot be avoided. Prefer restructuring code so the `#[expect]` is not needed (for arithmetic, see
   Expressions and idioms). Put the `#[expect]` on the narrowest item that needs it (e.g., the single `use` item),
   not on the whole crate. Clippy skips some lints in test builds (e.g., `wildcard_imports`), which leaves a plain
   `#[expect]` unfulfilled under `--all-targets`; use `#[cfg_attr(not(test), expect(...))]` for those. The `reason`
-  must say why the lint is harmless at every site it covers; recheck it whenever the code under it changes.
-- A lint that fights idiomatic code everywhere (e.g., `pattern_type_mismatch` vs default binding modes) belongs
-  in the `Cargo.toml` allow list, not in scattered `#[expect]`s.
+  must say why the lint is harmless at every site it covers; recheck it whenever the code under it changes. A lint
+  that fights idiomatic code everywhere gets a case-by-case allow in `Cargo.toml` instead (see [lints.md](lints.md)).
 - Always pass `--locked` to cargo commands that support it. Before declaring work done, run:
   ```sh
   cargo fmt --all --check
@@ -88,6 +67,17 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   `cargo dylint --git https://github.com/xorpse/rust-style --pattern '*'` (install with
   `cargo install cargo-dylint dylint-link`).
 - Dependabot cargo updates stay ungrouped.
+- Clippy quirks that come up often with this lint set:
+  - `renamed_function_params`: trait impls keep the trait's own parameter names (e.g., `f` in `fmt::Display::fmt`);
+    `min_ident_chars` doesn't flag them.
+  - `single_range_in_vec_init`: in tests, build a `Vec` of ranges from `(start, end)` pairs through a small helper
+    rather than writing `vec![start..end]`.
+  - `ref_patterns`: rely on default binding modes and dereference with `*` instead of `ref` bindings.
+  - `wildcard_enum_match_arm` also flags catch-all _binding_ arms (`entry => ...`), not just `_`: use an `if let`
+    chain (or explicit arms) instead.
+  - `double_must_use`: don't add `#[must_use]` to functions returning `impl Iterator` or other must-use types.
+  - `too_many_lines`: split a custom test harness's `main()` into `test_*` scenario functions and `check_*`
+    assertion functions.
 
 ## Rust Style Guide
 
@@ -118,8 +108,7 @@ parts by hand, since it doesn't:
 
 ## Imports
 
-- Three groups separated by a blank line: 1) `std`/`core`/`alloc`, 2) external crates,
-  3) `crate::`/`self::`/`super::`.
+- Three groups separated by a blank line: 1) `std`/`core`/`alloc`, 2) external crates, 3) `crate::`/`self::`/`super::`.
 - Group sibling leaf items only; never nest multi-segment paths inside braces, and never repeat the same prefix:
   ```rust
   use std::collections::{BTreeMap, HashSet};
@@ -140,6 +129,23 @@ parts by hand, since it doesn't:
 
 - A module that has (or may have) submodules is a directory with `mod.rs`; a leaf module is `module_name.rs`.
   Don't use the newer `module_name.rs` + `module_name/` layout for modules with submodules.
+- Items in a file follow this order, as in the template's `src/lib.rs` (clippy's `arbitrary_source_item_ordering`
+  is allowed because this order replaces its fixed one):
+  1. Inner attributes and crate or module docs (`#![doc = ...]`, `//!`).
+  2. Imports (see Imports).
+  3. Module declarations (`mod`, `pub mod`), then public re-exports (`pub use`), next to the modules they expose.
+  4. `macro_rules!` macros: their scope is textual, so they come before any code that uses them.
+  5. `const`s, then `static`s.
+  6. Type aliases.
+  7. Error types.
+  8. Traits, before the types that implement them.
+  9. Structs and enums, each followed by its impls: the inherent `impl`, then `impl` blocks with trait bounds, then
+     trait impls (std traits, then external crates', then the crate's own). Inside an impl: associated constants,
+     constructors (`new`, `with_*`, `from_*`), other associated functions, then methods (getters and setters
+     first).
+  10. Free functions, public ones (e.g., `run`) first.
+  11. `#[cfg(test)] mod tests` last (clippy's `items_after_test_module` enforces it): `use super::*;`, test
+      constants, helpers, then tests.
 
 ## Naming
 
@@ -149,7 +155,9 @@ parts by hand, since it doesn't:
 - Casing per RFC 430 (C-CASE). Use consistent word order across the codebase (C-WORD-ORDER).
 - Getters have no `get_` prefix: `timeout()`, `set_timeout()`, builder-style `with_timeout()` delegating to the
   setter (C-GETTER). Conversions follow `as_` (cheap borrow), `to_` (expensive), `into_` (consuming) (C-CONV).
-- Iterator-producing methods are `iter`/`iter_mut`/`into_iter` (C-ITER).
+- Iterator-producing methods are `iter`/`iter_mut`/`into_iter` (C-ITER). Wrapper types around a collection
+  expose `iter()` yielding flat tuples of every stored field (e.g., `(priority, id, func, name)`) instead of
+  letting other types reach into the inner map.
 - Error types have descriptive names (`HaruspexError`), never a bare `pub` `Error`.
 - Name variables for what they hold, matching the domain: `func_name`, `from`, `first_xref`, `dirpath`,
   `string_uses_count`, `marked`.
@@ -187,14 +195,25 @@ parts by hand, since it doesn't:
   (e.g., one `BTreeMap<(Priority, FunctionId), _>` instead of three maps).
 - Type aliases with a doc comment for recurring complex types (`type DumpCache = HashMap<Address, Option<...>>;`).
 - Only use `#[repr(u8)]`/explicit discriminants when the numeric values are actually used or are an external
-  contract (e.g., they match SDK constants, documented in a comment).
+  contract (e.g., they match SDK constants, documented in a comment). Otherwise, map variants to numeric codes
+  (e.g., a tag digit) with an explicit `match`, never a cast, so the codes don't depend on declaration order.
+- Keep data separate from context: data structs hold results (e.g., the functions found), while a context struct
+  holds the borrowed handle they're used with (e.g., `&IDB`) plus caches derived from it (e.g., `.plt` ranges), so
+  methods don't thread the handle through every call and derived state doesn't leak into unrelated data.
+- Derive strings from their constants in a single `format!` (e.g., `format!("{PREFIX}{}] {name}", level)`) instead
+  of hardcoding copies that must be kept in sync.
+- Validate deserialized input once, at the boundary: deserialize a raw struct shaped like the file and convert it
+  with `#[serde(try_from = "RawConfig")]`, so an invalid value can't be built. `From`/`TryFrom` impls must be pure
+  (no printing or other side effects). A private `TryFrom` used only by serde can use `type Error = String`, since
+  serde keeps only the error's `Display`.
 
 ## Structs and enums layout
 
 - No blank lines between consecutive fields or variants; doc comments between them are fine.
 - Enum variants in alphabetical order only when their order means nothing. When the order carries meaning
-  (priority, severity, log level, state machine, FFI), keep the meaningful order and never alphabetize it just to
-  satisfy xorpse's `sorted_enum_variants` lint (e.g., `Priority { High, Medium, Low }` stays as is).
+  (priority, severity, log level, state machine, FFI), keep it and never alphabetize it just to satisfy xorpse's
+  `sorted_enum_variants` lint (e.g., `Priority { High, Medium, Low }` stays as is); derive `Ord` from it and pin
+  the order with a unit test.
 
 ## Error handling
 
@@ -214,10 +233,13 @@ parts by hand, since it doesn't:
   Use `#[error(transparent)]` only when the variant adds nothing, e.g. it wraps a same-crate error that already
   describes the failure (singsing-rs's `ScanError::Incomplete`). Use `#[from]` only for a single, unambiguous
   conversion.
+- Lower layers return concrete error types (e.g., `Result<_, IDAError>`), even when a top-level caller uses
+  `anyhow`: only the top level converts to `anyhow` and adds context, so the concrete type isn't erased early and
+  combinators such as `.sum()` over `Result` work without conversions.
 - Error messages are always lowercase unless they start with a proper noun or acronym
   (`"no type definitions generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages, `anyhow`
-  context strings (`.context("failed to load known bad API function names")`), `anyhow::ensure!`/`bail!` messages,
-  and `IDAError::ffi_with` messages. User-facing `eprintln!` output lines are not error messages and keep their
+  context strings (`.context("failed to load known bad API function names")`), and `anyhow::ensure!`/`bail!`
+  messages. User-facing `eprintln!` output lines are not error messages and keep their
   prefix style (`[!] Error: {err:#}`).
 - Never silently ignore errors. When an error is deliberately ignored (best-effort work), say so in a comment and
   match the ignored variants explicitly rather than using `_` for everything.
@@ -230,7 +252,9 @@ parts by hand, since it doesn't:
 ## Expressions and idioms
 
 - Rely on inference; never annotate `let` bindings. Use turbofish or literal suffixes instead:
-  `Vec::<u8>::new()`, `.collect::<Vec<_>>()`, `0_usize`, not `let count: usize = 0;`.
+  `Vec::<u8>::new()`, `.collect::<Vec<_>>()`, `0_usize`, not `let count: usize = 0;`. When a method call needs a
+  type alias's concrete type, start from its default (`let mut marked = BookmarkIndex::default();` before
+  `saturating_add`) rather than a suffix like `0_u32`, which hardcodes the alias's definition.
 - Inline format arguments: `format!("{name}")`, `println!("{from:#X} in {caller}")`, `{err:#}` for anyhow chains.
 - `to_owned()`/`String::from` on `&str`, never `to_string()`. `clone_into` to reuse an existing allocation.
 - `Vec::new()` over `vec![]` for empty vectors (`vec![first]` for a non-empty literal is fine).
@@ -239,8 +263,11 @@ parts by hand, since it doesn't:
 - `let ... else` for early returns; `if let ... && ...` chains (edition 2024) instead of nested `if let`.
 - Walk linked chains with `iter::successors(first, Next::next)` (e.g., XREF chains with `XRef::next_to`) instead of
   manual `while let` loops. Use an explicit `Vec` work stack instead of recursion for unbounded depth.
-- Use the `Entry` API instead of `contains_key` + `insert`.
-- Arithmetic: prefer code that needs none, then `saturating_*` for counters, then `checked_*` when overflow is an
+- Use the `Entry` API instead of `contains_key` + `insert`, e.g., for first-wins duplicate detection in one
+  expression: `*map.entry(key).or_insert(value) != value` keeps the first value and tells whether a later one
+  differs.
+- Arithmetic: prefer code that needs none (e.g., total fallible counts with `.map(fallible).sum()` into a
+  `Result`, which stops at the first error), then `saturating_*` for counters, then `checked_*` when overflow is an
   error. When an operation provably cannot overflow, keep it bare under `#[expect(clippy::arithmetic_side_effects)]`
   with a `reason` saying why (e.g., "`end` is at most `line.len()`") rather than `checked_*` + `?`, which would turn
   a future bug into a silent `None`.
@@ -260,7 +287,7 @@ parts by hand, since it doesn't:
 ## Performance
 
 - Hoist loop-invariant work out of hot loops; compute once, store plain data, and query it cheaply.
-- Minimize FFI calls and allocations in hot paths (e.g., don't call `name()` twice for the same function, don't
+- Minimize FFI calls and allocations in hot paths (e.g., don't fetch the same FFI-backed value twice, and don't
   allocate a `String` per iteration just to compare a prefix).
 - Prefer a single lookup (`HashMap<String, Priority>`) over several sequential ones.
 - Linear scans over tiny collections (a handful of ranges) beat hashing or sorting.
@@ -318,6 +345,11 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   `#[expect(clippy::panic_in_result_fn, reason = "panics are allowed in test code")]` at module level.
 - Test names describe the behavior (`copy_to_creates_missing_output_directory`). Every assertion has a message.
 - Prove a new regression test can fail: temporarily break the behavior it guards, check that it fails, restore.
+- Verify behavior-preserving refactors against the last commit: build `HEAD` from `git archive HEAD` into a temp
+  directory (sharing the target directory), run both binaries on fresh copies of the same input, `cmp` their output,
+  and confirm the two binaries actually differ so the comparison isn't vacuous.
+- Prove the scope of mechanical changes (reflows, renames): e.g., for a comments-only diff, the code with comments
+  stripped must be identical to `HEAD`, and the comment text must be identical modulo whitespace.
 - Tests that pin an external contract (wire names, file formats, CLI output) use literal values, not the production
   constants, so an accidental change to a constant fails the test.
 - Extract time-dependent decisions out of I/O loops into pure functions that take `now: Instant` as a parameter
@@ -328,6 +360,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 ## Collaboration
 
 - Explain the plan for each change and wait for approval before implementing it.
+- One concern per commit: behavior-preserving refactors, mechanical reformatting (e.g., comment reflows), and new
+  behavior go in separate commits; start the next change only after the user has committed the previous one.
 - Weigh a fix's complexity against how often its inputs occur in the tool's domain: prefer the simplest fix that
   covers realistic inputs, document the remaining limitation and pin it with a test, and keep a more complete
   alternative on a branch if it might be wanted later.
