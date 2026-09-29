@@ -5,7 +5,10 @@ description: raptor's Rust style guide. Use whenever writing, reviewing, or refa
 
 # Rust style guide
 
-Sources: [idalib-rust-style](https://github.com/idalib-rs/idalib/blob/master/skills/idalib-rust-style/SKILL.md),
+Primary source: the official [Rust Style Guide](https://doc.rust-lang.org/style-guide/), the baseline for
+formatting and style (`rustfmt` enforces most of it; see the Rust Style Guide section below for what it doesn't).
+
+Other sources: [idalib-rust-style](https://github.com/idalib-rs/idalib/blob/master/skills/idalib-rust-style/SKILL.md),
 [xorpse/rust-style](https://github.com/xorpse/rust-style) lints,
 [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/checklist.html), and conventions established in
 these representative projects:
@@ -85,6 +88,33 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   `cargo dylint --git https://github.com/xorpse/rust-style --pattern '*'` (install with
   `cargo install cargo-dylint dylint-link`).
 - Dependabot cargo updates stay ungrouped.
+
+## Rust Style Guide
+
+The [Rust Style Guide](https://doc.rust-lang.org/style-guide/) applies in full. `rustfmt` enforces most of it
+(indentation, block indent, trailing commas, blank lines, trailing whitespace, attribute layout); follow these
+parts by hand, since it doesn't:
+
+- Line width: code lines are at most 100 characters. Comment-only lines are at most 80 characters excluding
+  indentation (sigils included) and never more than 100 in total, i.e., a top-level `///` line has 80 characters
+  and a doc comment on a method indented by 4 has 84. `rustfmt` doesn't reflow comments on stable, so wrap them
+  by hand, filling lines close to the limit. It can't split string literals either: keep assertion messages,
+  error messages, and other literals short enough to fit, rather than exceeding the limit or splitting them with
+  `\` continuations. Markdown files (`README.md`, `CHANGELOG.md`, `CLAUDE.md`) keep their own wrapping.
+- Comments: use line comments (`//`, `///`), not block comments (`/* */`, `/** */`); use inner doc comments
+  (`//!`) only for crate or module docs. Put comments on their own line; a comment after code is preceded by a
+  single space.
+- Doc comments go before attributes (`/// ...`, then `#[must_use]`), and each attribute goes on its own line.
+- A single `#[derive(...)]` attribute per item; when merging several, keep their order.
+- Prefer Rust's expression-oriented style: `let x = if y { 1 } else { 0 };`, not a `let x;` assigned in each
+  branch.
+- Names that clash with a reserved word use a raw identifier (`r#crate`) or a trailing underscore (`crate_`),
+  never a misspelling (`krate`).
+- Avoid `#[path]` module attributes.
+- Not adopted for now: the guide's
+  [`Cargo.toml` conventions](https://doc.rust-lang.org/style-guide/cargo.html) (`[package]` key order with
+  `description` last, version-sorted keys in other sections). Keep each project's existing `Cargo.toml` layout,
+  including the curated order of the baseline clippy allow list, and don't reorder `Cargo.toml` keys.
 
 ## Imports
 
