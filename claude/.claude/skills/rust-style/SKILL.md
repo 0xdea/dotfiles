@@ -224,9 +224,10 @@ parts by hand, since it doesn't:
 
 - Never `unwrap`, `expect`, `panic!`, `todo!`, `unimplemented!`, `unreachable!`, or `dbg!` outside tests.
 - Propagate with `?`. Binaries and top-level `run` functions use `anyhow` with `.context(...)`/
-  `.with_context(|| format!(...))`; libraries define `thiserror` enums and constructor methods for variants with
-  fields. Each variant should describe what failed in its own message, carry the relevant context in named fields,
-  and chain the underlying error as `#[source]` rather than repeating its message (see singsing-rs):
+  `.with_context(|| format!(...))`; errors that are part of a library's public API are `thiserror` enums with
+  constructor methods for variants with fields. Each variant should describe what failed in its own message,
+  carry the relevant context in named fields, and chain the underlying error as `#[source]` rather than repeating
+  its message (see singsing-rs):
   ```rust
   #[error("failed to read {}", path.display())]
   ServicesFileRead {
@@ -241,6 +242,13 @@ parts by hand, since it doesn't:
 - Lower layers return concrete error types (e.g., `Result<_, IDAError>`), even when a top-level caller uses
   `anyhow`: only the top level converts to `anyhow` and adds context, so the concrete type isn't erased early and
   combinators such as `.sum()` over `Result` work without conversions.
+- A private helper that combines several error sources and whose only callers already return `anyhow` returns
+  `anyhow::Result` with `.with_context(...)` per source (e.g., the file path on read and parse errors), rather than
+  a private `thiserror` enum that nothing matches on: the enum would be erased at the caller's first `?`. Its
+  single-source parts still return concrete types (a `parse(text) -> Result<_, TomlError>` called by
+  `load() -> anyhow::Result<_>`), and the underlying errors stay in the chain, so tests can still downcast them
+  (`err.chain().filter_map(|cause| cause.downcast_ref::<io::Error>())`). Once such errors become part of a
+  public API (callers need to tell failures apart), make them `thiserror` variants.
 - Error messages are always lowercase unless they start with a proper noun or acronym
   (`"no type definitions generated"`, `"I/O error: ..."`). This applies everywhere: `thiserror` messages, `anyhow`
   context strings (`.context("failed to load known bad API function names")`), and `anyhow::ensure!`/`bail!`
