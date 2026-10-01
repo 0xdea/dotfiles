@@ -220,7 +220,9 @@ Close calls, decided this way:
   keeps a node from being walked (and reported) twice.
 - `*map.entry(key).or_insert(value) != value` detects a conflicting duplicate while keeping the first value.
 - Arithmetic: prefer none (total fallible counts with `.map(fallible).sum()` into a `Result`), then `saturating_*`
-  for counters, then `checked_*` when overflow is an error. Provably safe operations stay bare under
+  for counters, then `checked_*` when overflow is an error. Use `.sum()` only when each step is a simple expression;
+  when a step prints or branches (e.g., augur's `traverse_xrefs`), a `for` loop with a `saturating_add` counter reads
+  more clearly, so keep it. Provably safe operations stay bare under
   `#[expect(clippy::arithmetic_side_effects)]` with a `reason`, rather than `checked_*` + `?`, which would turn a
   future bug into a silent `None`.
 - Don't add fallbacks for cases an earlier check rules out; state the guarantee in a comment instead.
