@@ -25,7 +25,7 @@ explicit_outlives_requirements = { level = "warn" }
 Clippy lints: all groups are enabled as warnings with `priority = -1`, so that the individual allows take precedence
 over them (keys in a TOML table have no order, so their position in the file doesn't decide it; clippy's
 `lint_groups_priority` flags a group left at the default priority), followed by the baseline allow list, wanted in
-every project and kept in this curated order (don't sort it; see the Rust Style Guide section of `SKILL.md`):
+every project and kept in this curated order (don't sort it; see the Formatting by hand section of `SKILL.md`):
 
 ```toml
 [workspace.lints.clippy]

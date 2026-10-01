@@ -1,16 +1,16 @@
 ---
 name: rust-style
-description: raptor's Rust style guide. Use whenever writing, reviewing, or refactoring Rust code.
+description: raptor's Rust conventions for layout, naming, API design, error handling, lints, tests, CLI output, and collaboration. Use whenever writing, reviewing, or refactoring Rust code, tests, or Cargo.toml lint configuration, or when starting a new Rust project.
 ---
 
 # Rust style guide
 
-Primary source: the official [Rust Style Guide](https://doc.rust-lang.org/style-guide/) (`rustfmt` enforces most
-of it; see the Rust Style Guide section for the rest). Other sources:
+This guide records raptor's choices and lessons learned; standard Rust practice is assumed. Baselines: the
+[Rust Style Guide](https://doc.rust-lang.org/style-guide/) and the
+[Rust API Guidelines](https://rust-lang.github.io/api-guidelines/checklist.html) apply in full. Other sources:
 [idalib-rust-style](https://github.com/idalib-rs/idalib/blob/master/skills/idalib-rust-style/SKILL.md),
-[xorpse/rust-style](https://github.com/xorpse/rust-style) lints, the
-[Rust API Guidelines](https://rust-lang.github.io/api-guidelines/checklist.html), and these representative
-projects: [augur](https://github.com/0xdea/augur), [rhabdomancer](https://github.com/0xdea/rhabdomancer),
+[xorpse/rust-style](https://github.com/xorpse/rust-style) lints, and these representative projects:
+[augur](https://github.com/0xdea/augur), [rhabdomancer](https://github.com/0xdea/rhabdomancer),
 [haruspex](https://github.com/0xdea/haruspex), [idalib](https://github.com/idalib-rs/idalib),
 [zed-highlight](https://github.com/0xdea/zed-highlight), and [singsing-rs](https://github.com/0xdea/singsing-rs).
 When unsure how something is usually done, look at how they do it (local clones may be under
@@ -74,23 +74,31 @@ the scaffolding (Cargo.toml metadata and lints, CI workflows, CHANGELOG, README)
   - `too_many_lines`: split a custom test harness's `main()` into `test_*` scenarios and `check_*` assertions.
   - `doc_markdown` flags mixed-case words such as "AArch64": rephrase ("ARM64") rather than backtick non-code.
 
-## Rust Style Guide
+## Defaults to apply
 
-The [Rust Style Guide](https://doc.rust-lang.org/style-guide/) applies in full. `rustfmt` enforces most of it;
-follow these parts by hand:
+Close calls, decided this way:
+
+- No type annotations on `let` bindings: use turbofish or suffixes (`.collect::<Vec<_>>()`, `0_usize`).
+- `let ... else` for early returns; `if let ... && ...` chains instead of nested `if let`.
+- Combinators that state intent (`is_some_and`, `map_or_else`, `unwrap_or_default`, `filter_map` + `bool::then`,
+  `Option::map_or(Ok(()), ...)` for optional fallible work); the `Entry` API, not `contains_key` + `insert`.
+- Borrowed parameter types (`&Path`, `&str`, `&[u8]`); public functions taking a path use `impl AsRef<Path>`,
+  converted once at the top by shadowing: `let filepath = filepath.as_ref();`.
+- Derive common traits eagerly, in alphabetical order (small enums: `Clone, Copy, Debug, Eq, PartialEq`, plus
+  `Ord`/`Hash` when useful, passed by value); derive `Default` instead of a `new()` that only builds defaults.
+- `#[must_use]` on pure functions whose result matters, private ones included; `const fn` wherever possible;
+  `#[non_exhaustive]` on public enums and `pub`-field structs that may grow.
+- `Result<Option<T>, E>` for an expected absence (like `Child::try_wait`); `anyhow::ensure!` for preconditions.
+
+## Formatting by hand
+
+`rustfmt` doesn't enforce these:
 
 - Line width: code lines are at most 100 characters. Comment-only lines are at most 80 characters excluding
   indentation (sigils included) and never more than 100 in total (a top-level `///` line has 80, one in a method
-  indented by 4 has 84). `rustfmt` doesn't reflow comments on stable: wrap them by hand, filling lines close to the
-  limit. It can't split string literals either: keep messages short enough to fit, without `\` continuations.
-  Markdown files keep their own wrapping.
-- Comments: line comments (`//`, `///`), never block comments; `//!` only for crate or module docs. Comments go on
-  their own line; a comment after code is preceded by a single space.
-- Doc comments go before attributes; each attribute on its own line; a single `#[derive(...)]` per item (when
-  merging several, keep their order).
-- Prefer expressions: `let x = if y { 1 } else { 0 };`, not a `let x;` assigned in each branch.
+  indented by 4 has 84). Wrap comments by hand, filling lines close to the limit. String literals can't be split
+  either: keep messages short enough to fit, without `\` continuations. Markdown files keep their own wrapping.
 - Names clashing with a reserved word use `r#crate` or `crate_`, never a misspelling (`krate`).
-- Avoid `#[path]` module attributes.
 - Not adopted for now: the guide's [`Cargo.toml` conventions](https://doc.rust-lang.org/style-guide/cargo.html).
   Keep each project's existing `Cargo.toml` layout (including the curated order of the clippy allow list), and
   don't reorder its keys.
@@ -110,8 +118,7 @@ follow these parts by hand:
   ```
   Not `use std::{collections::HashMap, path::PathBuf};`, and not two separate `use std::collections::...` lines.
 - Import traits used only for their methods as `_`. No fully qualified type paths in signatures
-  (`std::path::PathBuf`): import the type, or keep one disambiguating module (`io::Result`, `fmt::Result`). No
-  useless imports (`use log;`).
+  (`std::path::PathBuf`): import the type, or keep one disambiguating module (`io::Result`, `fmt::Result`).
 
 ## Module layout
 
@@ -133,27 +140,24 @@ follow these parts by hand:
      first).
   10. Free functions, public ones (e.g., `run`) first.
   11. `#[cfg(test)] mod tests` last: `use super::*;`, test constants, helpers, then tests.
+- No blank lines between consecutive struct fields or enum variants. Alphabetize variants only when their order
+  means nothing; when it carries meaning (priority, severity, state machine, FFI), keep it despite xorpse's
+  `sorted_enum_variants`, derive `Ord` from it, and pin it with a test.
 
 ## Naming
 
-- Casing per RFC 430 (C-CASE); consistent word order (C-WORD-ORDER).
-- Getters have no `get_` prefix: `timeout()`, `set_timeout()`, builder-style `with_timeout()` delegating to the
-  setter (C-GETTER). Conversions: `as_` (cheap borrow), `to_` (expensive), `into_` (consuming) (C-CONV).
-- Iterator methods are `iter`/`iter_mut`/`into_iter` (C-ITER). A wrapper around a collection exposes `iter()`
-  yielding flat tuples of the stored fields (`(priority, id, func, name)`) instead of exposing the inner map.
 - Error types have descriptive names (`HaruspexError`), never a bare `pub` `Error`.
 - Name variables for what they hold, in the domain's terms (`func_name`, `first_xref`, `dirpath`, `marked`), and
   never after a crate they use (`fn parse(text: &str)`, not `toml: &str` next to `toml::from_str`).
+- A wrapper around a collection exposes `iter()` yielding flat tuples of the stored fields
+  (`(priority, id, func, name)`) instead of exposing the inner map.
 
 ## Types and API design
 
-- Accept borrowed types (C-GENERIC): `&Path`/`impl AsRef<Path>` over `&PathBuf`, `&str` over `&String`, `&[u8]`
-  over `&Vec<u8>`. Public functions taking a path use `impl AsRef<Path>`, converted once at the top:
-  `let filepath = filepath.as_ref();`.
 - No trivial getters/setters: a `pub` field is fine when a setter would add no checks. Enforce invariants with
   types instead (newtypes, enums instead of flags or magic values, `NonZero*`, validating constructors), and keep a
-  field private only when it guards an invariant types can't express or its representation may change
-  (C-STRUCT-PRIVATE). `pub(crate)` is fine internally.
+  field private only when it guards an invariant types can't express or its representation may change.
+  `pub(crate)` is fine internally.
 - Encode an invariant in a type only when the excluded value is genuinely invalid (port zero), not merely unusual (a
   zero timeout can be meaningful; a CLI may still narrow the range), and make it hold on every path: a check only a
   parser performs, while a `pub` field accepts anything, is a hole. Write validated literals as checked consts
@@ -162,21 +166,10 @@ follow these parts by hand:
   export a constant just because its value is an external text contract (e.g., a tag written into files): document
   the format in the README. A library API is designed as such (e.g., returning results without printing them), not
   obtained by exporting CLI-oriented types.
-- Derive common traits eagerly (C-COMMON-TRAITS), in alphabetical order: small enums are
-  `Clone, Copy, Debug, Eq, PartialEq` (plus `Ord`/`Hash` when useful) and passed by value; all public types are
-  `Debug` (C-DEBUG). Derive `Default` instead of a `new()` that only builds defaults.
-- `#[non_exhaustive]` on public enums that may grow and on public structs with `pub` fields that may gain more (then
-  provide a constructor). `#[must_use]` on pure functions whose result matters, private ones included; `const fn`
-  wherever possible.
-- Functions with a clear receiver are methods (C-METHOD); constructors are static inherent methods (C-CTOR).
-- Return values instead of out-parameters (C-NO-OUT), and don't store state in a field just to return it once.
-- A method that updates state as it works (e.g., a set of processed items) takes `&mut self`, not a `RefCell`:
-  `.map(|item| self.step(item)).sum()` still works, since the closure is `FnMut`.
-- Types, not `bool`/`Option` flags, convey meaning in arguments (C-CUSTOM-TYPE); newtypes for static distinctions
-  (C-NEWTYPE).
+- Don't store state in a field just to return it once. A method that updates state as it works (e.g., a set of
+  processed items) takes `&mut self`, not a `RefCell`: `.map(|item| self.step(item)).sum()` still works.
 - One structure keyed by a composite or enum key over parallel structures dispatched by `match` (one
   `BTreeMap<(Priority, FunctionId), _>`, not three maps).
-- Documented type aliases for recurring complex types (`type DumpCache = HashMap<Address, Option<...>>;`).
 - `#[repr(u8)]`/explicit discriminants only when the values are used or are an external contract (e.g., SDK
   constants). Otherwise map variants to codes with an explicit `match`, never a cast, so codes don't depend on
   declaration order.
@@ -188,18 +181,12 @@ follow these parts by hand:
   with `#[serde(try_from = "RawConfig")]`. `From`/`TryFrom` impls are pure (no printing). A private `TryFrom` used
   only by serde can use `type Error = String`, since serde keeps only its `Display`.
 
-## Structs and enums layout
-
-- No blank lines between consecutive fields or variants; doc comments between them are fine.
-- Alphabetize variants only when their order means nothing. When it carries meaning (priority, severity, state
-  machine, FFI), keep it despite xorpse's `sorted_enum_variants`, derive `Ord` from it, and pin it with a test.
-
 ## Error handling
 
-- Propagate with `?`. Binaries and top-level `run` functions use `anyhow` with `.context(...)`/
-  `.with_context(|| format!(...))`. Errors in a library's public API are `thiserror` enums (with constructor
-  methods for variants with fields): each variant describes what failed, carries context in named fields, and
-  chains the underlying error as `#[source]` rather than repeating its message (see singsing-rs):
+- Binaries and top-level `run` functions use `anyhow` with `.context(...)`/`.with_context(|| format!(...))`.
+  Errors in a library's public API are `thiserror` enums (with constructor methods for variants with fields): each
+  variant describes what failed, carries context in named fields, and chains the underlying error as `#[source]`
+  rather than repeating its message (see singsing-rs):
   ```rust
   #[error("failed to read {}", path.display())]
   ServicesFileRead {
@@ -222,42 +209,31 @@ follow these parts by hand:
   variants explicitly rather than with `_`.
 - Use `inspect_err` for cleanup on failure, and report (don't propagate) cleanup failures. Cleanup never deletes
   pre-existing data: create the output directory before, and outside, the path the cleanup covers.
-- `Result<Option<T>, E>` separates fatal errors from an expected absence (like `Child::try_wait`).
-- `anyhow::ensure!` for precondition checks.
 
 ## Expressions and idioms
 
-- Rely on inference; never annotate `let` bindings. Use turbofish or suffixes: `.collect::<Vec<_>>()`, `0_usize`.
-  For a type alias, start from its default (`BookmarkIndex::default()`) rather than a suffix that hardcodes its
-  definition.
-- `{err:#}` for anyhow chains; `clone_into` to reuse an allocation.
-- Prefer combinators that state intent: `is_some_and`, `map_or`, `map_or_else`, `unwrap_or_default`, `and_then`,
-  `filter_map` + `bool::then`, `Option::map_or(Ok(()), ...)` for optional fallible work.
-- `let ... else` for early returns; `if let ... && ...` chains instead of nested `if let`.
-- Walk linked chains with `iter::successors(first, Next::next)` instead of `while let` loops; use an explicit `Vec`
-  work stack instead of recursion for unbounded depth. For graph-like traversals, keep a visited set seeded with the
-  start (`HashSet::from([start])`) and queue a key only `if visited.insert(key)`: that bounds the work, ends cycles,
-  and keeps a node from being walked (and reported) twice.
-- Use the `Entry` API instead of `contains_key` + `insert`; `*map.entry(key).or_insert(value) != value` detects a
-  conflicting duplicate while keeping the first value.
+- For a type alias, start from its default (`BookmarkIndex::default()`) rather than a suffix that hardcodes its
+  definition (`0_u32`).
+- Walk linked chains with `iter::successors(first, Next::next)`; use an explicit `Vec` work stack instead of
+  recursion for unbounded depth. For graph-like traversals, keep a visited set seeded with the start
+  (`HashSet::from([start])`) and queue a key only `if visited.insert(key)`: that bounds the work, ends cycles, and
+  keeps a node from being walked (and reported) twice.
+- `*map.entry(key).or_insert(value) != value` detects a conflicting duplicate while keeping the first value.
 - Arithmetic: prefer none (total fallible counts with `.map(fallible).sum()` into a `Result`), then `saturating_*`
   for counters, then `checked_*` when overflow is an error. Provably safe operations stay bare under
   `#[expect(clippy::arithmetic_side_effects)]` with a `reason`, rather than `checked_*` + `?`, which would turn a
   future bug into a silent `None`.
 - Don't add fallbacks for cases an earlier check rules out; state the guarantee in a comment instead.
-- Shadow for a clear transformation of the same value (`let filepath = filepath.as_ref();`,
-  `let port = port.trim().parse::<u16>()?;`, `let mut buf = buf;`); never reuse a name for an unrelated value
-  (`shadow_unrelated` stays enabled).
+- Shadow for a clear transformation of the same value (`let port = port.trim().parse::<u16>()?;`,
+  `let mut buf = buf;`); never reuse a name for an unrelated value (`shadow_unrelated` stays enabled).
 - No sentinel values to force a code path (passing `BADADDR` to get `None`); express the `Option` flow directly.
 - At OS, FFI, and dependency boundaries, read what the code actually does rather than assuming (e.g., a zero
   `SO_RCVTIMEO` blocks forever; a function may return `Ok(())` without writing its output).
 
 ## Performance
 
-- Hoist loop-invariant work out of hot loops: compute once, store plain data, query it cheaply.
-- Minimize FFI calls and allocations in hot paths (don't fetch the same FFI value twice, don't allocate a `String`
-  just to compare a prefix). Prefer a single lookup over several sequential ones.
-- Linear scans beat hashing or sorting for tiny collections.
+- Minimize FFI calls and allocations in hot paths: don't fetch the same FFI value twice, cache derived data (e.g.,
+  segment ranges) once, and don't allocate a `String` just to compare a prefix.
 - Under a lock, only snapshot what you need and release it before scanning or I/O; keep a check followed by a
   mutation under a single lock.
 - Measure before claiming a speedup or no regression, with a differential test against the old version; report
@@ -292,15 +268,14 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 - Every item has a doc comment (`missing_docs` is on), private ones and test helpers included; only `fn main()`
   and `#[test]` functions are exempt. Crate docs include the README:
   `#![cfg_attr(doc, doc = include_str!("../README.md"))]`.
-- Doc comments describe behavior, parameters by name in backticks, and return values, with `# Errors` (and
-  `# Panics`/`# Safety`) sections (C-FAILURE) and intra-doc links (C-LINK).
-- Comments are full sentences ending with a period, and explain _why_, not _what_ (prefer self-explanatory code).
-  Keep them accurate when code changes; a justifying comment must hold on every path that reaches the code.
+- Doc comments name parameters in backticks and have `# Errors` (and `# Panics`/`# Safety`) sections.
+- Comments are full sentences ending with a period, and explain _why_, not _what_. A justifying comment must hold
+  on every path that reaches the code.
 - `unsafe` blocks need a `// Safety:` comment (e.g., `env::set_var` in a single-threaded test binary).
 - `CHANGELOG.md` follows Keep a Changelog: entries under `[Unreleased]` in `Added`/`Changed`/`Fixed`/`Removed`/
-  `Security`, one short imperative sentence each, code names in backticks (C-RELNOTES).
-- `Cargo.toml` has full metadata: authors, description, license, homepage, repository, keywords, categories
-  (C-METADATA); set `documentation` only when docs.rs isn't suitable.
+  `Security`, one short imperative sentence each, code names in backticks.
+- `Cargo.toml` has full metadata (authors, description, license, homepage, repository, keywords, categories); set
+  `documentation` only when docs.rs isn't suitable.
 
 ## Tests
 
@@ -337,4 +312,5 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   `git status` afterwards.
 - After a change: run the checks above, update `CLAUDE.md` and `CHANGELOG.md` when relevant, and summarize what
   changed and how it was verified.
-- Before adding a rule to this skill, check whether an existing bullet already covers it or can absorb it.
+- Before adding a rule to this skill, check whether an existing bullet already covers it or can absorb it, and
+  whether Claude would follow it anyway without being told (then leave it out).
