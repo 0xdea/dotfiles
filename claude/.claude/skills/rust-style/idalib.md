@@ -31,3 +31,19 @@ addition to `SKILL.md`.
   context chain).
 - Reset and check every IDB file, packed or unpacked (`i64`, `id0`, `id1`, `id2`, `nam`, `til`), not just the
   `.i64`, so that a crashed run can't leave a stale database behind for the next scenario.
+- IDA must run on the main thread ("IDA cannot function correctly when not running on the main thread"), so
+  standard `#[test]` functions, which run on worker threads, can't use it. For a throwaway probe of IDA's view
+  of a binary, write a temporary `examples/` program (`cargo run --example ...`), then delete it.
+- `IDB::open` doesn't save the database on close; `IDB::open_with(path, true, true)` does. Test fixtures that
+  must persist (e.g., a pre-existing user bookmark) need `open_with`.
+- Never look a bookmark up by address: IDA overlays bookmarks added at an already bookmarked address, and
+  `get_description(ea)` returns only one of them, possibly a user's own. Scan every index (`get_address(idx)` +
+  `get_description_by_index(idx)`) and track your own bookmarks in a set, updated as you add them.
+- ELF PLT facts to know before touching thunk handling:
+  - IDA splits each lazy-binding `.plt` stub into its own function, and nothing references the stubs, so the
+    stubs' `jmp PLT0` XREFs form no cycle.
+  - On AArch64, a stub (`adrp`/`ldr`/`add`/`br`) can have several XREFs to its import, so traversals that follow
+    stubs must deduplicate (see the visited-set rule in `SKILL.md`).
+  - A bad function typically matches twice by name, as its `.plt` stub (a thunk) and as its import. Don't
+    deduplicate them by name: an unrelated function can normalize to the same name, or IDA may not link the stub
+    to the import, and the stub's call sites would be lost.

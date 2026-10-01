@@ -78,6 +78,8 @@ cargo generate --git https://github.com/0xdea/raptor-rust-template
   - `double_must_use`: don't add `#[must_use]` to functions returning `impl Iterator` or other must-use types.
   - `too_many_lines`: split a custom test harness's `main()` into `test_*` scenario functions and `check_*`
     assertion functions.
+  - `doc_markdown`: flags mixed-case words in doc comments (e.g., "AArch64") as identifiers missing backticks;
+    rephrase the word (e.g., "ARM64") rather than backticking something that isn't code.
 
 ## Rust Style Guide
 
@@ -189,6 +191,9 @@ parts by hand, since it doesn't:
 - Functions with a clear receiver are methods (C-METHOD). Constructors are static inherent methods (C-CTOR).
 - Return values instead of taking out-parameters (C-NO-OUT): a traversal returns `Result<usize, _>` rather than
   incrementing a `&mut usize`. Don't store state in a struct field just to return it once.
+- When a method updates state while it works (e.g., a set of already processed items), take `&mut self`
+  rather than reaching for interior mutability (`RefCell`): iterator adapters such as
+  `.map(|item| self.step(item)).sum()` can still borrow `self` mutably, since their closures are `FnMut`.
 - Use types, not `bool`/`Option` flags, to convey meaning in arguments (C-CUSTOM-TYPE); newtypes for static
   distinctions (C-NEWTYPE).
 - Prefer one data structure keyed by a composite or enum key over parallel structures dispatched by `match`
@@ -263,6 +268,9 @@ parts by hand, since it doesn't:
 - `let ... else` for early returns; `if let ... && ...` chains (edition 2024) instead of nested `if let`.
 - Walk linked chains with `iter::successors(first, Next::next)` (e.g., XREF chains with `XRef::next_to`) instead of
   manual `while let` loops. Use an explicit `Vec` work stack instead of recursion for unbounded depth.
+- For graph-like traversals, use a worklist of keys (e.g., addresses) plus a visited set seeded with the start
+  (`HashSet::from([start])`), and queue a key only `if visited.insert(key)`: that single guard bounds the work,
+  makes cycles terminate, and keeps the same node from being walked (and reported) twice.
 - Use the `Entry` API instead of `contains_key` + `insert`, e.g., for first-wins duplicate detection in one
   expression: `*map.entry(key).or_insert(value) != value` keeps the first value and tells whether a later one
   differs.
@@ -313,6 +321,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   `default_value = "15"` string that clap only parses at runtime.
 - Results go to stdout (`println!`); everything else (banner, progress, summary, timing, errors) goes to stderr
   (`eprintln!`).
+- Before refactoring code that produces output, decide whether its order is a contract (e.g., the order of
+  listed results), and document the decision either way.
 - Message prefixes: `[*]` progress, `[+]` success/summary, `[-]` information, `[!]` warning/error. Report errors as
   `eprintln!("[!] Error: {err:#}")`. Print elapsed time with `{:.1} seconds`.
 - No emojis and no decorations around printed output, unless they are explicitly requested (see
@@ -350,6 +360,10 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   and confirm the two binaries actually differ so the comparison isn't vacuous.
 - Prove the scope of mechanical changes (reflows, renames): e.g., for a comments-only diff, the code with comments
   stripped must be identical to `HEAD`, and the comment text must be identical modulo whitespace.
+- When a change intentionally reorders output, compare it per group (e.g., each header's set of lines) instead
+  of byte for byte, and say so if the test data can't actually exercise the reordering.
+- When the behavior under test is what a binary prints, and the library prints it directly, run the real binary
+  as a subprocess (`process::Command::new(env!("CARGO_BIN_EXE_<name>"))`) and pin its stdout with a literal.
 - Tests that pin an external contract (wire names, file formats, CLI output) use literal values, not the production
   constants, so an accidental change to a constant fails the test.
 - Extract time-dependent decisions out of I/O loops into pure functions that take `now: Instant` as a parameter
@@ -365,6 +379,9 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 - Weigh a fix's complexity against how often its inputs occur in the tool's domain: prefer the simplest fix that
   covers realistic inputs, document the remaining limitation and pin it with a test, and keep a more complete
   alternative on a branch if it might be wanted later.
+- For output-only improvements (shorter or tidier output), prefer redundant but complete output over any
+  heuristic that could drop results, and over code that only buys cosmetics; offer "leave it and document it" as
+  an option.
 - Never `git commit` (or push); the user reviews and commits.
 - After a change: run the checks above, update `CLAUDE.md` and `CHANGELOG.md` when relevant, and summarize what
   changed and how it was verified.
