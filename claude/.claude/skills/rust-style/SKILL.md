@@ -85,7 +85,12 @@ Close calls, decided this way:
 - Borrowed parameter types (`&Path`, `&str`, `&[u8]`); public functions taking a path use `impl AsRef<Path>`,
   converted once at the top by shadowing: `let filepath = filepath.as_ref();`.
 - Derive common traits eagerly, in alphabetical order (small enums: `Clone, Copy, Debug, Eq, PartialEq`, plus
-  `Ord`/`Hash` when useful, passed by value); derive `Default` instead of a `new()` that only builds defaults.
+  `Ord`/`Hash` when useful, passed by value).
+- Constructors are chosen by meaning, not by number of arguments: `Default` (derived when possible) for a natural,
+  cheap empty value, instead of a `new()` that only builds defaults; `From`/`TryFrom` only when the type is a
+  conversion of one value (newtypes, validating wrappers), never just because there is one argument
+  (`FunctionDumper::new(idb)`, like `BufReader::new`); otherwise `new`, whatever its arity, with named alternatives
+  (`with_*`, `from_*`, `open`).
 - `#[must_use]` on pure functions whose result matters, private ones included; `const fn` wherever possible;
   `#[non_exhaustive]` on public enums and `pub`-field structs that may grow.
 - `Result<Option<T>, E>` for an expected absence (like `Child::try_wait`); `anyhow::ensure!` for preconditions.
