@@ -3,7 +3,8 @@
 Every project uses the lint setup of the [raptor-rust-template](https://github.com/0xdea/raptor-rust-template)
 `Cargo.toml`, made of the blocks below. Any other allow is decided case by case: when a project allows an extra lint,
 don't flag it as drift, but ask about it if it looks unnecessary. A lint that fights idiomatic code everywhere (e.g.,
-`pattern_type_mismatch` vs default binding modes) belongs in the allow list, not in scattered `#[expect]`s.
+`pattern_type_mismatch` vs default binding modes, or `rest_pattern_accessible_field` vs `unneeded_field_pattern`,
+which ban `..` and `field: _` respectively) belongs in the allow list, not in scattered `#[expect]`s.
 
 The crate opts into the workspace lints; without this, the `[workspace.lints]` tables have no effect on it:
 
@@ -42,6 +43,7 @@ arbitrary_source_item_ordering = "allow"
 implicit_return = "allow"
 question_mark_used = "allow"
 pattern_type_mismatch = "allow"
+rest_pattern_accessible_field = "allow"
 shadow_reuse = "allow"
 shadow_same = "allow"
 print_stdout = "allow"
