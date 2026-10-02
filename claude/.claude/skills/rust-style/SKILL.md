@@ -224,8 +224,10 @@ Close calls, decided this way:
   (`HashSet::from([start])`) and queue a key only `if visited.insert(key)`: that bounds the work, ends cycles, and
   keeps a node from being walked (and reported) twice.
 - `*map.entry(key).or_insert(value) != value` detects a conflicting duplicate while keeping the first value.
-- Arithmetic: prefer none (total fallible counts with `.map(fallible).sum()` into a `Result`), then `saturating_*`
-  for counters, then `checked_*` when overflow is an error. Use `.sum()` only when each step is a simple expression;
+- Arithmetic: prefer none written out (total fallible counts with `.map(fallible).sum()` into a `Result`), then
+  `saturating_*` for counters, then `checked_*` when overflow is an error. `sum()`/`product()` still add: clippy
+  doesn't lint them, and they wrap in release builds, so use them only when the total is provably bounded, and state
+  the bound in the doc comment. Use `.sum()` only when each step is a simple expression;
   when a step prints or branches (e.g., augur's `traverse_xrefs`), a `for` loop with a `saturating_add` counter reads
   more clearly, so keep it. Provably safe operations stay bare under
   `#[expect(clippy::arithmetic_side_effects)]` with a `reason`, rather than `checked_*` + `?`, which would turn a
