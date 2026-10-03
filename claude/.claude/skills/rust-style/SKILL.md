@@ -282,7 +282,9 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   on every path that reaches the code.
 - `unsafe` blocks need a `// Safety:` comment (e.g., `env::set_var` in a single-threaded test binary).
 - `CHANGELOG.md` follows Keep a Changelog: entries under `[Unreleased]` in `Added`/`Changed`/`Fixed`/`Removed`/
-  `Security`, one short imperative sentence each, code names in backticks.
+  `Security`, one short imperative sentence each, code names in backticks. Prefix each breaking change to the public
+  API with `**Breaking:**` (e.g., under `Changed` or `Removed`, as in haruspex); text changes such as lowercased
+  error messages aren't breaking, and past releases aren't marked retroactively.
 - `Cargo.toml` has full metadata (authors, description, license, homepage, repository, keywords, categories); set
   `documentation` only when docs.rs isn't suitable.
 
