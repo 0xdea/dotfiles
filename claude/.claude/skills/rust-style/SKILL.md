@@ -82,7 +82,10 @@ Close calls, decided this way:
 - No type annotations on `let` bindings: use turbofish or suffixes (`.collect::<Vec<_>>()`, `0_usize`).
 - `let ... else` for early returns; `if let ... && ...` chains instead of nested `if let`.
 - Combinators that state intent (`is_some_and`, `map_or_else`, `unwrap_or_default`, `filter_map` + `bool::then`,
-  `Option::map_or(Ok(()), ...)` for optional fallible work); the `Entry` API, not `contains_key` + `insert`.
+  `Option::map_or(Ok(()), ...)` for optional fallible work); the `Entry` API, not `contains_key` + `insert`. Clear
+  code beats clever code: use a combinator only when it reads more simply than the plain version. When a chain needs
+  juggling, such as `.map(...).transpose()?` to run fallible work inside an `Option`, write `if let` or `match`
+  instead, even if it's a line or two longer.
 - Borrowed parameter types (`&Path`, `&str`, `&[u8]`); public functions taking a path use `impl AsRef<Path>`,
   converted once at the top by shadowing: `let filepath = filepath.as_ref();`.
 - Derive common traits eagerly, in alphabetical order (small enums: `Clone, Copy, Debug, Eq, PartialEq`, plus
