@@ -192,15 +192,23 @@ Close calls, decided this way:
 
 - Binaries and top-level `run` functions use `anyhow` with `.context(...)`/`.with_context(|| format!(...))`.
   Errors in a library's public API are `thiserror` enums (with constructor methods for variants with fields): each
-  variant describes what failed, carries context in named fields, and chains the underlying error as `#[source]`
-  rather than repeating its message (see singsing-rs):
+  variant describes what failed, carries context in named fields, and chains the underlying error with an explicit
+  `#[source]` rather than repeating its message. A variant that only wraps an error, with no other context, is a
+  tuple variant; a variant with context uses named fields, each documented, with the error in a `source` field
+  (adapted from singsing-rs):
   ```rust
   #[derive(Debug, thiserror::Error)]
   #[non_exhaustive]
-  pub enum ExampleError {
+  pub enum ScanError {
+      /// Creating the raw transport socket failed.
+      #[error("failed to create raw socket (run as root or grant CAP_NET_RAW)")]
+      SocketCreation(#[source] io::Error),
+      /// The services file could not be read.
       #[error("failed to read {}", path.display())]
       ServicesFileRead {
+          /// The services file path.
           path: PathBuf,
+          /// The underlying I/O error.
           #[source]
           source: io::Error,
       },
