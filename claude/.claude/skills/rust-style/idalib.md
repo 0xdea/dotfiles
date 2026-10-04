@@ -11,7 +11,8 @@ addition to `SKILL.md`.
 - Some operations only queue work for auto-analysis (e.g., decompiling can create strings): call `idb.auto_wait()`
   before reading the results. `IDB::open` with auto-analysis already waits.
 - Names from the analyzed binary (strings, function names) are untrusted: sanitize them into a single path
-  component before building file names, and unit-test path traversal.
+  component before building file names, and unit-test path traversal. When printing them, use `str::escape_debug()`
+  at the print site; file names still come from the raw name through the sanitizer.
 - Cache segment ranges as `Vec<Range<Address>>`: IDA's `range_t` is half-open (`end_ea` excluded), exactly like
   `Range::contains`.
 - Handle `.plt` thunk indirection for ELF binaries, and skip `FunctionFlags::THUNK` functions where appropriate.

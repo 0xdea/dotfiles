@@ -176,7 +176,8 @@ Close calls, decided this way:
 - Keep the public API minimal: making an item public later is non-breaking, making it private is breaking. Don't
   export a constant just because its value is an external text contract (e.g., a tag written into files): document
   the format in the README. A library API is designed as such (e.g., returning results without printing them), not
-  obtained by exporting CLI-oriented types.
+  obtained by exporting CLI-oriented types. Every public error variant must be returnable by some public function,
+  and a private helper that has one caller and only forwards to another function should be inlined.
 - Don't store state in a field just to return it once. A method that updates state as it works (e.g., a set of
   processed items) takes `&mut self`, not a `RefCell`: `.map(|item| self.step(item)).sum()` still works.
 - One structure keyed by a composite or enum key over parallel structures dispatched by `match` (one
@@ -306,7 +307,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   API with `**Breaking:**` (e.g., under `Changed` or `Removed`, as in haruspex); text changes such as lowercased
   error messages aren't breaking, and past releases aren't marked retroactively.
 - `Cargo.toml` has full metadata (authors, description, license, homepage, repository, keywords, categories); set
-  `documentation` only when docs.rs isn't suitable.
+  `documentation` only when docs.rs isn't suitable. Declare `rust-version` when using an API newer than the edition's
+  minimum Rust version, and confirm the value with clippy's `incompatible_msrv` (it fires when set one version lower).
 
 ## Tests
 
