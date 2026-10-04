@@ -55,6 +55,7 @@ the scaffolding (Cargo.toml metadata and lints, CI workflows, CHANGELOG, README)
   extra CI steps (e.g., a WASM target build).
 - Optional extra checks: `cargo fmt -- --config imports_granularity=Module,group_imports=StdExternalCrate` and
   `cargo dylint --git https://github.com/xorpse/rust-style --pattern '*'` (`cargo install cargo-dylint dylint-link`).
+  Ignore `thiserror_conventions`' constructor sub-rule, which conflicts with the error-handling rules below.
 - Dependabot cargo updates stay ungrouped.
 - Clippy enforces these; write them right the first time:
   - No single-character identifiers (`min_ident_chars`): `name`, `func`, `idx`, `addr`, `err`, not `s`, `f`, `e`.
@@ -191,11 +192,10 @@ Close calls, decided this way:
 ## Error handling
 
 - Binaries and top-level `run` functions use `anyhow` with `.context(...)`/`.with_context(|| format!(...))`.
-  Errors in a library's public API are `thiserror` enums (with constructor methods for variants with fields): each
-  variant describes what failed, carries context in named fields, and chains the underlying error with an explicit
-  `#[source]` rather than repeating its message. A variant that only wraps an error, with no other context, is a
-  tuple variant; a variant with context uses named fields, each documented, with the error in a `source` field
-  (adapted from singsing-rs):
+  Errors in a library's public API are `thiserror` enums: each variant describes what failed, carries context in
+  named fields, and chains the underlying error with an explicit `#[source]` rather than repeating its message. A
+  variant that only wraps an error, with no other context, is a tuple variant; a variant with context uses named
+  fields, each documented, with the error in a `source` field (adapted from singsing-rs):
   ```rust
   #[derive(Debug, thiserror::Error)]
   #[non_exhaustive]
@@ -214,6 +214,9 @@ Close calls, decided this way:
       },
   }
   ```
+  Build variants inline where they occur, passing tuple variants straight to `map_err`
+  (`.map_err(ScanError::SocketCreation)`). Add a constructor method only when a variant is built in several places,
+  needs a conversion, or is meant for other crates, as idalib's `IDAError::ffi` and `IDAError::not_found`.
   `#[error(transparent)]` only when the variant adds nothing; `#[from]` only for a single, unambiguous conversion.
 - Lower layers return concrete error types (`Result<_, IDAError>`, `Result<_, TomlError>`); only the top level
   converts to `anyhow` and adds context, so combinators like `.sum()` over `Result` need no conversions. The
