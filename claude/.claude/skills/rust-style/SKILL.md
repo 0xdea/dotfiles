@@ -123,7 +123,9 @@ Close calls, decided this way:
   ```
   Not `use std::{collections::HashMap, path::PathBuf};`, and not two separate `use std::collections::...` lines.
 - Import traits used only for their methods as `_`. No fully qualified type paths in signatures
-  (`std::path::PathBuf`): import the type, or keep one disambiguating module (`io::Result`, `fmt::Result`).
+  (`std::path::PathBuf`): import the type, or keep one disambiguating module (`io::Result`, `fmt::Result`). For the
+  same reason, derive `thiserror::Error` by path (`#[derive(Debug, thiserror::Error)]`) instead of importing it, so
+  it isn't mistaken for `std::error::Error`.
 
 ## Module layout
 
@@ -193,12 +195,16 @@ Close calls, decided this way:
   variant describes what failed, carries context in named fields, and chains the underlying error as `#[source]`
   rather than repeating its message (see singsing-rs):
   ```rust
-  #[error("failed to read {}", path.display())]
-  ServicesFileRead {
-      path: PathBuf,
-      #[source]
-      source: io::Error,
-  },
+  #[derive(Debug, thiserror::Error)]
+  #[non_exhaustive]
+  pub enum ExampleError {
+      #[error("failed to read {}", path.display())]
+      ServicesFileRead {
+          path: PathBuf,
+          #[source]
+          source: io::Error,
+      },
+  }
   ```
   `#[error(transparent)]` only when the variant adds nothing; `#[from]` only for a single, unambiguous conversion.
 - Lower layers return concrete error types (`Result<_, IDAError>`, `Result<_, TomlError>`); only the top level
