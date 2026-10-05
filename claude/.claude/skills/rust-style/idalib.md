@@ -29,6 +29,8 @@ addition to `SKILL.md`.
 - To test a per-function decompilation failure, build a tiny object file whose function exceeds Hex-Rays' 64 KB
   `MAX_FUNCSIZE` (augur's `too_big.c`: stores to a `volatile` local, no linker needed), keeping its source and build
   command next to it.
+- To test a processor without a decompiler, patch the ELF `e_machine` of a small data-only object (e.g., to MSP430,
+  as in haruspex's `no_decompiler.c`), since idalib's open options can't select the processor.
 - Reset and check every IDB file, packed or unpacked (`i64`, `id0`, `id1`, `id2`, `nam`, `til`), not just the
   `.i64`, so that a crashed run can't leave a stale database behind for the next scenario.
 - IDA must run on the main thread ("IDA cannot function correctly when not running on the main thread"), so
