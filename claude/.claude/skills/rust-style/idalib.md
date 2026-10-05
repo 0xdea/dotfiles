@@ -26,6 +26,9 @@ addition to `SKILL.md`.
 - Structure the harness like augur's: `main()` calls `idalib::force_batch_mode()` first, then one `test_*`
   function per scenario, each printing a `[*] Checking ... Ok.` line per check. Scenarios start and end with a
   reset helper and `drop()` their `IDB` before the code under test reopens the database.
+- To test a per-function decompilation failure, build a tiny object file whose function exceeds Hex-Rays' 64 KB
+  `MAX_FUNCSIZE` (augur's `too_big.c`: stores to a `volatile` local, no linker needed), keeping its source and build
+  command next to it.
 - Reset and check every IDB file, packed or unpacked (`i64`, `id0`, `id1`, `id2`, `nam`, `til`), not just the
   `.i64`, so that a crashed run can't leave a stale database behind for the next scenario.
 - IDA must run on the main thread ("IDA cannot function correctly when not running on the main thread"), so

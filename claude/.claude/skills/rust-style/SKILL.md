@@ -318,13 +318,17 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 - Prove a new test can fail: temporarily break what it guards, check that it fails, restore. If an earlier check
   catches the break first, skip that one too, so the new check is shown to fail on its own.
 - Negative tests fail only on the targeted defect (an invalid-TOML input is otherwise a valid configuration, or a
-  missing-field error keeps it green); a test checking an order asserts that its data has more than one group.
+  missing-field error keeps it green); a test checking an order asserts that its data has more than one group, and
+  one checking which value is returned uses data where the candidates differ (e.g., a returned count that differs
+  from the other counts).
 - Verify behavior-preserving refactors against `HEAD`: build it from `git archive HEAD` in a temp directory (sharing
   the target directory), run both binaries on fresh copies of the same input, `cmp` their output, and confirm the
   binaries differ. For mechanical changes, prove the scope (e.g., code with comments stripped identical to `HEAD`,
   comment text identical modulo whitespace). For intentional reorderings, compare per group, and say so if the test
   data can't exercise the reordering.
-- Pin what a binary prints by running it as a subprocess (`process::Command::new(env!("CARGO_BIN_EXE_<name>"))`).
+- Pin what a binary prints by running it as a subprocess (`process::Command::new(env!("CARGO_BIN_EXE_<name>"))`),
+  matching whole lines (`lines().any(|line| line == expected)`), not `contains`, with the expected literal passed
+  in by the scenario.
 - Tests of an external contract (file formats, CLI output) use literals, not production constants.
 - Check error kinds, not OS-dependent messages: downcast through the chain to `io::ErrorKind`.
 - Extract time-dependent decisions into pure functions taking `now: Instant` (singsing-rs's `receive_wait`).
