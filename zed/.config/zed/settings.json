@@ -102,7 +102,9 @@
     "allow_data_collection": "no",
   },
   "agent": {
-    "sidebar_side": "right",
+    "threads_sidebar": {
+      "position": "right",
+    },
     "dock": "right",
     "limit_content_width": false,
     "default_profile": "write",
