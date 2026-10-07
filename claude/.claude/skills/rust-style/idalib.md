@@ -12,7 +12,11 @@ addition to `SKILL.md`.
   before reading the results. `IDB::open` with auto-analysis already waits.
 - Names from the analyzed binary (strings, function names) are untrusted: sanitize them into a single path
   component before building file names, and unit-test path traversal. When printing them, use `str::escape_debug()`
-  at the print site; file names still come from the raw name through the sanitizer.
+  at the print site; file names still come from the raw name through the sanitizer. Put fixed output labels (e.g.,
+  `(lib)`) before the untrusted name, never after it, so that a crafted name can't fake them.
+- When walking XREFs to a function to find its call sites, query `XRefQuery::FAR`: `ALL` also returns ordinary-flow
+  XREFs (the previous instruction falling through), i.e., false call sites in alignment padding or after calls that
+  never return.
 - Cache segment ranges as `Vec<Range<Address>>`: IDA's `range_t` is half-open (`end_ea` excluded), exactly like
   `Range::contains`.
 - Handle `.plt` thunk indirection for ELF binaries, and skip `FunctionFlags::THUNK` functions where appropriate.
@@ -32,7 +36,8 @@ addition to `SKILL.md`.
 - To test a processor without a decompiler, patch the ELF `e_machine` of a small data-only object (e.g., to MSP430,
   as in haruspex's `no_decompiler.c`), since idalib's open options can't select the processor.
 - Reset and check every IDB file, packed or unpacked (`i64`, `id0`, `id1`, `id2`, `nam`, `til`), not just the
-  `.i64`, so that a crashed run can't leave a stale database behind for the next scenario.
+  `.i64`, so that a crashed run can't leave a stale database behind for the next scenario. IDA names the IDB of
+  `foo.exe` `foo.exe.i64`, while `with_extension("i64")` gives `foo.i64`: name test binaries without an extension.
 - IDA must run on the main thread ("IDA cannot function correctly when not running on the main thread"), so
   standard `#[test]` functions, which run on worker threads, can't use it. For a throwaway probe of IDA's view
   of a binary, write a temporary `examples/` program (`cargo run --example ...`), then delete it.

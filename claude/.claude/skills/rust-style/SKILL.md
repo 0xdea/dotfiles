@@ -307,8 +307,10 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   API with `**Breaking:**` (e.g., under `Changed` or `Removed`, as in haruspex); text changes such as lowercased
   error messages aren't breaking, and past releases aren't marked retroactively.
 - `Cargo.toml` has full metadata (authors, description, license, homepage, repository, keywords, categories); set
-  `documentation` only when docs.rs isn't suitable. Declare `rust-version` when using an API newer than the edition's
-  minimum Rust version, and confirm the value with clippy's `incompatible_msrv` (it fires when set one version lower).
+  `documentation` only when docs.rs isn't suitable. Declare `rust-version` when anything needs a Rust newer than the
+  edition's minimum (an API, a language feature such as `let` chains, or a dependency's own `rust-version`). Clippy's
+  `incompatible_msrv` only checks APIs (it fires when set one version lower): confirm language features and
+  dependencies by building with that toolchain.
 
 ## Tests
 
@@ -317,6 +319,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 - Test names describe the behavior (`copy_to_creates_missing_output_directory`); every assertion has a message.
 - Prove a new test can fail: temporarily break what it guards, check that it fails, restore. If an earlier check
   catches the break first, skip that one too, so the new check is shown to fail on its own.
+- When a test relies on how an external tool treats its fixture (e.g., IDA naming a stub `strcpy_0`), check that
+  first, so the test fails instead of passing without testing anything.
 - Negative tests fail only on the targeted defect (an invalid-TOML input is otherwise a valid configuration, or a
   missing-field error keeps it green); a test checking an order asserts that its data has more than one group, and
   one checking which value is returned uses data where the candidates differ (e.g., a returned count that differs
