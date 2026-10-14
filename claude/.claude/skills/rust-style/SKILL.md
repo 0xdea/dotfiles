@@ -95,6 +95,9 @@ Close calls, decided this way:
   conversion of one value (newtypes, validating wrappers), never just because there is one argument
   (`FunctionDumper::new(idb)`, like `BufReader::new`); otherwise `new`, whatever its arity, with named alternatives
   (`with_*`, `from_*`, `open`).
+- Many parameters, or several of the same type, go in a config struct taken by the function (`scan(&ScanConfig)`),
+  not a long positional list: fields read as named arguments, `Default` or `new` supplies defaults, and
+  `#[non_exhaustive]` makes adding a field non-breaking.
 - `#[must_use]` on pure functions whose result matters, private ones included; `const fn` wherever possible;
   `#[non_exhaustive]` on public enums and `pub`-field structs that may grow.
 - `Result<Option<T>, E>` for an expected absence (like `Child::try_wait`); `anyhow::ensure!` for preconditions.
