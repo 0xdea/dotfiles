@@ -1,5 +1,3 @@
 [user]
 	name = raptor
 	email = raptor@0xdeadbeef.info
-[alias]
-	ida = !cd \"${GIT_PREFIX:-.}\" && \"/home/raptor/ida-pro-9.4/tools/teams/git-ida\"
