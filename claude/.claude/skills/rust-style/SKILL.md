@@ -14,7 +14,7 @@ This guide records raptor's choices and lessons learned; standard Rust practice 
 [haruspex](https://github.com/0xdea/haruspex), [idalib](https://github.com/idalib-rs/idalib),
 [zed-highlight](https://github.com/0xdea/zed-highlight), and [singsing-rs](https://github.com/0xdea/singsing-rs).
 When unsure how something is usually done, look at how they do it (local clones may be under
-`~/Dev/`, `~/DevContainer/`, or `/workspaces/`).
+`~/Dev/`, `~/DevContainer/`, or `/workspaces/` and its subdirectories, e.g., `/workspaces/DevContainer/`).
 
 ## New projects
 
