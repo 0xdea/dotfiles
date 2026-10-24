@@ -90,20 +90,21 @@ Close calls, decided this way:
 - Borrowed parameter types (`&Path`, `&str`, `&[u8]`); public functions taking a path use `impl AsRef<Path>`,
   converted once at the top by shadowing: `let filepath = filepath.as_ref();`.
 - Derive common traits eagerly, in alphabetical order (small enums: `Clone, Copy, Debug, Eq, PartialEq`, plus
-  `Ord`/`Hash` when useful, passed by value).
+  `Hash` or `Ord` with `PartialOrd` when useful, passed by value).
 - Constructors are chosen by meaning, not by number of arguments: `Default` (derived when possible) for a natural,
   cheap empty value, instead of a `new()` that only builds defaults; `From`/`TryFrom` only when the type is a
   conversion of one value (newtypes, validating wrappers), never just because there is one argument
   (`FunctionDumper::new(idb)`, like `BufReader::new`); otherwise `new`, whatever its arity, with named alternatives
   (`with_*`, `from_*`, `open`).
 - Many parameters, or several of the same type, go in a config struct taken by the function (`scan(&ScanConfig)`),
-  not a long positional list: fields read as named arguments, `Default` or `new` supplies defaults, and
-  `#[non_exhaustive]` makes adding a field non-breaking (other crates then can't write
+  not a long positional list: fields read as named arguments, `Default` or `new` supplies defaults, and if it may
+  grow, `#[non_exhaustive]` makes adding a field non-breaking (other crates then can't write
   `ScanConfig { ports, ..Default::default() }`: they set fields on a `ScanConfig::default()` instead).
 - `#[must_use]` on pure functions whose result matters, private ones included; `const fn` wherever possible (on a
   library's `pub` functions, only if it can stay `const`: removing it is breaking); `#[non_exhaustive]` on public
   enums and `pub`-field structs that may grow.
-- `Result<Option<T>, E>` for an expected absence (like `Child::try_wait`); `anyhow::ensure!` for preconditions.
+- `Result<Option<T>, E>` for an expected absence (like `Child::try_wait`); `anyhow::ensure!` for
+  preconditions in `anyhow` code.
 
 ## Formatting by hand
 
@@ -120,7 +121,8 @@ Close calls, decided this way:
 
 ## Imports
 
-- Three groups separated by a blank line: 1) `std`/`core`/`alloc`, 2) external crates, 3) `crate::`/`self::`/`super::`.
+- Three groups separated by a blank line: 1) `std`/`core`/`alloc`, 2) external crates,
+  3) `crate::`/`self::`/`super::`.
 - Group sibling leaf items only; never nest multi-segment paths inside braces or repeat a prefix:
   ```rust
   use std::collections::{BTreeMap, HashSet};
@@ -166,9 +168,6 @@ Close calls, decided this way:
 - Error types have descriptive names (`HaruspexError`), never a bare `pub` `Error`.
 - Name variables for what they hold, in the domain's terms (`func_name`, `first_xref`, `dirpath`, `marked`), and
   never after a crate they use (`fn parse(text: &str)`, not `toml: &str` next to `toml::from_str`).
-- Tuples only for pairs or local values (private, destructured at once, fields of distinct types); otherwise use a
-  struct with named fields. A wrapper around a collection exposes `iter()` yielding such flat items
-  (`Entry { priority, id, func, name }`) instead of exposing the inner map.
 
 ## Types and API design
 
@@ -189,6 +188,9 @@ Close calls, decided this way:
   processed items) takes `&mut self`, not a `RefCell`: `.map(|item| self.step(item)).sum()` still works.
 - One structure keyed by a composite or enum key over parallel structures dispatched by `match` (one
   `BTreeMap<(Priority, FunctionId), _>`, not three maps).
+- Tuples only for pairs or local values (private, destructured at once, fields of distinct types); otherwise use a
+  struct with named fields. A wrapper around a collection exposes `iter()` yielding such flat items
+  (`Entry { priority, id, func, name }`) instead of exposing the inner map.
 - `#[repr(u8)]`/explicit discriminants only when the values are used or are an external contract (e.g., SDK
   constants). Otherwise map variants to codes with an explicit `match`, never a cast, so codes don't depend on
   declaration order.
@@ -255,11 +257,10 @@ Close calls, decided this way:
 - Arithmetic: prefer none written out (total fallible counts with `.map(fallible).sum()` into a `Result`), then
   `saturating_*` for counters, then `checked_*` when overflow is an error. `sum()`/`product()` still add: clippy
   doesn't lint them, and they wrap in release builds, so use them only when the total is provably bounded, and state
-  the bound in the doc comment. Use `.sum()` only when each step is a simple expression;
-  when a step prints or branches (e.g., augur's `traverse_xrefs`), a `for` loop with a `saturating_add` counter reads
-  more clearly, so keep it. Provably safe operations stay bare under
-  `#[expect(clippy::arithmetic_side_effects)]` with a `reason`, rather than `checked_*` + `?`, which would turn a
-  future bug into a silent `None`.
+  the bound in the doc comment. Use `.sum()` only when each step is a simple expression; when a step prints or
+  branches (e.g., augur's `traverse_xrefs`), a `for` loop with a `saturating_add` counter reads more clearly, so keep
+  it. Provably safe operations stay bare under `#[expect(clippy::arithmetic_side_effects)]` with a `reason`, rather
+  than `checked_*` + `?`, which would turn a future bug into a silent `None`.
 - Don't add fallbacks for cases an earlier check rules out; state the guarantee in a comment instead.
 - Shadow for a clear transformation of the same value (`let port = port.trim().parse::<u16>()?;`,
   `let mut buf = buf;`); never reuse a name for an unrelated value (`shadow_unrelated` stays enabled).
@@ -303,8 +304,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 
 ## Documentation and comments
 
-- Every item has a doc comment (`missing_docs` is on), private ones and test helpers included; only `fn main()`
-  and `#[test]` functions are exempt. Crate docs include the README:
+- Every item has a doc comment (`missing_docs`, plus clippy's `missing_docs_in_private_items`), private ones and
+  test helpers included; only `fn main()` and `#[test]` functions are exempt. Crate docs include the README:
   `#![cfg_attr(doc, doc = include_str!("../README.md"))]`.
 - Doc comments name parameters in backticks and have `# Errors` (and `# Panics`/`# Safety`) sections.
 - Comments are full sentences ending with a period, and explain _why_, not _what_. A justifying comment must hold
