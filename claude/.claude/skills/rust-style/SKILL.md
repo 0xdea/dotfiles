@@ -14,7 +14,7 @@ This guide records raptor's choices and lessons learned; standard Rust practice 
 [haruspex](https://github.com/0xdea/haruspex), [idalib](https://github.com/idalib-rs/idalib),
 [zed-highlight](https://github.com/0xdea/zed-highlight), and [singsing-rs](https://github.com/0xdea/singsing-rs).
 When unsure how something is usually done, look at how they do it (local clones may be under
-`~/RustroverProjects/`).
+`~/Dev/`, `~/DevContainer/`, or `/workspaces/`).
 
 ## New projects
 
@@ -85,7 +85,8 @@ Close calls, decided this way:
   `Option::map_or(Ok(()), ...)` for optional fallible work); the `Entry` API, not `contains_key` + `insert`. Clear
   code beats clever code: use a combinator only when it reads more simply than the plain version. When a chain needs
   juggling, such as `.map(...).transpose()?` to run fallible work inside an `Option`, write `if let` or `match`
-  instead, even if it's a line or two longer.
+  instead, even if it's a line or two longer. Bind a chain that would span several lines to a named variable rather
+  than writing it in a `for` header.
 - Borrowed parameter types (`&Path`, `&str`, `&[u8]`); public functions taking a path use `impl AsRef<Path>`,
   converted once at the top by shadowing: `let filepath = filepath.as_ref();`.
 - Derive common traits eagerly, in alphabetical order (small enums: `Clone, Copy, Debug, Eq, PartialEq`, plus
@@ -97,9 +98,11 @@ Close calls, decided this way:
   (`with_*`, `from_*`, `open`).
 - Many parameters, or several of the same type, go in a config struct taken by the function (`scan(&ScanConfig)`),
   not a long positional list: fields read as named arguments, `Default` or `new` supplies defaults, and
-  `#[non_exhaustive]` makes adding a field non-breaking.
-- `#[must_use]` on pure functions whose result matters, private ones included; `const fn` wherever possible;
-  `#[non_exhaustive]` on public enums and `pub`-field structs that may grow.
+  `#[non_exhaustive]` makes adding a field non-breaking (other crates then can't write
+  `ScanConfig { ports, ..Default::default() }`: they set fields on a `ScanConfig::default()` instead).
+- `#[must_use]` on pure functions whose result matters, private ones included; `const fn` wherever possible (on a
+  library's `pub` functions, only if it can stay `const`: removing it is breaking); `#[non_exhaustive]` on public
+  enums and `pub`-field structs that may grow.
 - `Result<Option<T>, E>` for an expected absence (like `Child::try_wait`); `anyhow::ensure!` for preconditions.
 
 ## Formatting by hand
@@ -163,8 +166,9 @@ Close calls, decided this way:
 - Error types have descriptive names (`HaruspexError`), never a bare `pub` `Error`.
 - Name variables for what they hold, in the domain's terms (`func_name`, `first_xref`, `dirpath`, `marked`), and
   never after a crate they use (`fn parse(text: &str)`, not `toml: &str` next to `toml::from_str`).
-- A wrapper around a collection exposes `iter()` yielding flat tuples of the stored fields
-  (`(priority, id, func, name)`) instead of exposing the inner map.
+- Tuples only for pairs or local values (private, destructured at once, fields of distinct types); otherwise use a
+  struct with named fields. A wrapper around a collection exposes `iter()` yielding such flat items
+  (`Entry { priority, id, func, name }`) instead of exposing the inner map.
 
 ## Types and API design
 
@@ -268,7 +272,8 @@ Close calls, decided this way:
 - Minimize FFI calls and allocations in hot paths: don't fetch the same FFI value twice, cache derived data (e.g.,
   segment ranges) once, and don't allocate a `String` just to compare a prefix.
 - Under a lock, only snapshot what you need and release it before scanning or I/O; keep a check followed by a
-  mutation under a single lock.
+  mutation under a single lock. Never recover a poisoned lock's data (`PoisonError::into_inner`): propagate the
+  error.
 - Measure before claiming a speedup or no regression, with a differential test against the old version; report
   micro-optimizations that fixed costs dominate as code-quality improvements.
 
@@ -304,7 +309,7 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 - Doc comments name parameters in backticks and have `# Errors` (and `# Panics`/`# Safety`) sections.
 - Comments are full sentences ending with a period, and explain _why_, not _what_. A justifying comment must hold
   on every path that reaches the code.
-- `unsafe` blocks need a `// Safety:` comment (e.g., `env::set_var` in a single-threaded test binary).
+- `unsafe` blocks need a `// SAFETY:` comment (e.g., `env::set_var` in a single-threaded test binary).
 - `CHANGELOG.md` follows Keep a Changelog: entries under `[Unreleased]` in `Added`/`Changed`/`Fixed`/`Removed`/
   `Security`, one short imperative sentence each, code names in backticks. Prefix each breaking change to the public
   API with `**Breaking:**` (e.g., under `Changed` or `Removed`, as in haruspex); text changes such as lowercased
@@ -319,7 +324,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 
 - Unit tests live in `#[cfg(test)] mod tests` with `use super::*;`, return `Result` where useful, and carry
   `#[expect(clippy::panic_in_result_fn, reason = "panics are allowed in test code")]` at module level.
-- Test names describe the behavior (`copy_to_creates_missing_output_directory`); every assertion has a message.
+- Test names describe the behavior (`copy_to_creates_missing_output_directory`); every assertion has a message
+  saying why it should hold or what was got, not a restatement of the condition.
 - Prove a new test can fail: temporarily break what it guards, check that it fails, restore. If an earlier check
   catches the break first, skip that one too, so the new check is shown to fail on its own.
 - When a test relies on how an external tool treats its fixture (e.g., IDA naming a stub `strcpy_0`), check that
