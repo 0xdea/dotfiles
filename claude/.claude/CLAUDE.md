@@ -1,5 +1,9 @@
 # Global instructions
 
+## Workflow
+
+Explain the plan for each change and wait for my approval before implementing it.
+
 ## Git
 
 Never run `git commit`, `git commit --amend`, or `git push` unless I explicitly ask for that specific action. Make

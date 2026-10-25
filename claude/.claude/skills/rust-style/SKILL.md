@@ -353,10 +353,8 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
 
 ## Collaboration
 
-- Explain the plan for each change and wait for approval before implementing it.
 - One concern per commit: behavior-preserving refactors, mechanical reformatting, and new behavior go in separate
   commits; start the next change only after the user has committed the previous one.
-- Never `git commit` (or push); the user reviews and commits.
 - Weigh a fix's complexity against how often its inputs occur: prefer the simplest fix covering realistic inputs,
   document and test the remaining limitation, and keep a fuller alternative on a branch if it may be wanted.
 - For output-only improvements, prefer redundant but complete output over heuristics that could drop results or
