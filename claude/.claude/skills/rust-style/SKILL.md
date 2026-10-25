@@ -97,9 +97,9 @@ Close calls, decided this way:
   (`FunctionDumper::new(idb)`, like `BufReader::new`); otherwise `new`, whatever its arity, with named alternatives
   (`with_*`, `from_*`, `open`).
 - Many parameters, or several of the same type, go in a config struct taken by the function (`scan(&ScanConfig)`),
-  not a long positional list: fields read as named arguments, `Default` or `new` supplies defaults, and if it may
-  grow, `#[non_exhaustive]` makes adding a field non-breaking (other crates then can't write
-  `ScanConfig { ports, ..Default::default() }`: they set fields on a `ScanConfig::default()` instead).
+  not a long positional list: fields read as named arguments; `Default` supplies defaults when every field has one,
+  otherwise `new` takes the required fields. If it may grow, `#[non_exhaustive]` makes adding a field non-breaking
+  (other crates then can't use a struct literal: they set fields on the value `default()` or `new` returns).
 - `#[must_use]` on pure functions whose result matters, private ones included; `const fn` wherever possible (on a
   library's `pub` functions, only if it can stay `const`: removing it is breaking); `#[non_exhaustive]` on public
   enums and `pub`-field structs that may grow.
@@ -190,7 +190,9 @@ Close calls, decided this way:
   `BTreeMap<(Priority, FunctionId), _>`, not three maps).
 - Tuples only for pairs or local values (private, destructured at once, fields of distinct types); otherwise use a
   struct with named fields. A wrapper around a collection exposes `iter()` yielding such flat items
-  (`Entry { priority, id, func, name }`) instead of exposing the inner map.
+  (`Entry { priority, id, func, name }`) instead of exposing the inner map. Library functions that only iterate over
+  an input take `impl IntoIterator` rather than `&[T]`, and return `impl Iterator` rather than a `Vec` the caller may
+  not need, unless the function builds or owns the collection anyway.
 - `#[repr(u8)]`/explicit discriminants only when the values are used or are an external contract (e.g., SDK
   constants). Otherwise map variants to codes with an explicit `match`, never a cast, so codes don't depend on
   declaration order.
