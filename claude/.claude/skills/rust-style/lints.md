@@ -56,4 +56,5 @@ mod_module_files = "allow"
 single_call_fn = "allow"
 separated_literal_suffix = "allow"
 default_numeric_fallback = "allow"
+multiple_crate_versions = "allow"
 ```
