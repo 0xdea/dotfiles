@@ -5,6 +5,16 @@ addition to `SKILL.md`.
 
 - Types whose methods call FFI on an IDB or derived objects must be bound to the IDB lifetime
   (`struct Foo<'a> { _marker: PhantomData<&'a IDB> }` or by holding `Function<'a>`, etc.).
+- Objects whose destructors call into IDA (`Function`, `Segment`, `CFunction`) must be dropped before their `IDB`.
+  Since idalib 0.11, the borrow checker enforces this (E0505 for an explicit `drop(idb)`, E0597 when the `IDB` goes
+  out of scope first): fix those errors by reordering declarations or dropping the derived objects first, never by
+  working around the lifetime.
+- A type that directly owns an FFI object whose destructor calls into IDA (e.g., a cxx `UniquePtr` to a lock or a
+  decompiled function) and is bound to the `IDB` only through `PhantomData` needs an explicit, even empty,
+  `impl Drop`: without one, dropck doesn't require the `IDB` to outlive it, so the destructor can run after the
+  database is closed (idalib-rs/idalib#84). Types that just hold `Function<'a>`, `Segment<'a>`, or `CFunction<'a>`
+  don't need one, since those already implement `Drop`; and a `Drop` impl prevents moving fields out of the type
+  (E0509), so don't add it elsewhere.
 - Call `idalib::force_batch_mode()` before opening any database, including in test harnesses.
 - `decompile()` always passes `DECOMP_NO_CACHE`, so each call is a full decompilation: decompile each function at
   most once per run, caching results and failures (e.g., augur's `DumpCache`).
@@ -20,10 +30,12 @@ addition to `SKILL.md`.
 - Cache segment ranges as `Vec<Range<Address>>`: IDA's `range_t` is half-open (`end_ea` excluded), exactly like
   `Range::contains`.
 - Handle `.plt` thunk indirection for ELF binaries, and skip `FunctionFlags::THUNK` functions where appropriate.
-- Stop on Hex-Rays license errors, but tolerate per-function decompilation failures.
+- Stop when no function can be decompiled, but tolerate per-function decompilation failures. Since idalib 0.11,
+  `IDB::decompiler_available()` also checks the decompiler license, so a missing license usually shows up there,
+  before any decompilation: check it first, and keep mapping Hex-Rays `License` errors as a backstop.
 - The lowercase rule for error messages in `SKILL.md` also covers `IDAError::ffi_with` messages.
 - Add `linker_messages = "allow"` to `[workspace.lints.rust]` (after the baseline in `lints.md`), with a comment
-  pointing to the workaround it is for (https://github.com/idalib-rs/idalib/issues/81), until that issue is fixed.
+  pointing to https://github.com/idalib-rs/idalib/issues/81, which closed with this suppression as the fix.
 - IDA-dependent integration tests use a custom harness (`harness = false`) because IDA is not thread-safe and CI
   has no IDA (on small inputs, auto-analysis dominates their runtime); CI only compiles them
   (`cargo test --no-run`). They clean up any `.i64` and temporary files.
