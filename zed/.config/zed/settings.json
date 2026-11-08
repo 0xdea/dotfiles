@@ -223,7 +223,7 @@
     },
   },
 
-  // rust-analyzer
+  // language servers
   "lsp": {
     "rust-analyzer": {
       "initialization_options": {
@@ -236,6 +236,17 @@
         "checkOnSave": true,
         "cargo": { "allFeatures": true },
         "procMacro": { "enable": true },
+      },
+    },
+    "taplo": {
+      "settings": {
+        "formatter": {
+          "columnWidth": 120,
+          "allowedBlankLines": 1,
+          "indentString": "    ",
+        },
+        // skip the SchemaStore catalog that taplo 0.10.0 can't parse
+        "schema": { "catalogs": [] },
       },
     },
   },
@@ -260,21 +271,12 @@
       // "preferred_line_length": 100,
     },
     "TOML": {
-      "formatter": {
-        "external": {
-          "command": "taplo",
-          "arguments": ["fmt", "-"],
-        },
-      },
+      "formatter": "language_server",
       "format_on_save": "on",
     },
     "Markdown": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "file.md"],
-        },
-      },
+      "formatter": "prettier",
+      "tab_size": 2,
       "format_on_save": "on",
     },
     "Assembly": {
