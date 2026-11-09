@@ -33,6 +33,9 @@ else if test (uname) = "Darwin"
   fish_add_path /opt/homebrew/bin
   fish_add_path /opt/homebrew/sbin
 
+  # devc: build dev containers with these dotfiles
+  set -gx DEVC_DOTFILES_REPO https://github.com/0xdea/dotfiles.git
+
   alias script "command script -aF"
   alias ida "/Applications/IDA\ Professional\ 9.5.app/Contents/MacOS/ida"
 
