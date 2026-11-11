@@ -236,6 +236,9 @@
         "checkOnSave": true,
         "cargo": { "allFeatures": true },
         "procMacro": { "enable": true },
+        "files": {
+          "exclude": ["raptor-rust-template"],
+        },
       },
     },
     "taplo": {
@@ -263,6 +266,11 @@
       { "token_type": "zed-highlight-6", "foreground_color": "#52BE80", "background_color": "#52BE8050" },
       { "token_type": "zed-highlight-7", "foreground_color": "#FF9933", "background_color": "#FF993350" },
     ],
+  },
+
+  // file types
+  "file_types": {
+    "Plain Text": ["**/raptor-rust-template/template/.github/**/*.yml"],
   },
 
   // languages
