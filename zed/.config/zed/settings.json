@@ -52,6 +52,9 @@
     "inline_blame": {
       "location": "status_bar",
     },
+    "auto_fetch": {
+      "enabled": true,
+    },
   },
   "command_aliases": {
     "os": "zed::OpenSettings",
@@ -290,7 +293,7 @@
     "Assembly": {
       "formatter": {
         "external": {
-          "command": "asmfmt",
+          "command": "gasfmt",
         },
       },
       "format_on_save": "on",
