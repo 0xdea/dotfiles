@@ -7,9 +7,11 @@ Explain the plan for each change and wait for my approval before implementing it
 ## Git
 
 Never run `git commit`, `git commit --amend`, or `git push` unless I explicitly ask for that specific action. Make
-and test the changes, then leave them uncommitted so I can review them by hand and commit them myself. When a change
-should be split into several commits, describe the split (files and hunks per commit) and suggest the commit
-messages.
+and test the changes, then leave them uncommitted so I can review them by hand and commit them myself. Always
+suggest the commit message; when a change should be split into several commits, describe the split (files and
+hunks per commit) and suggest a message for each. Commit messages follow Conventional Commits
+(`type: lowercase imperative summary`, `!` for breaking changes), with the type chosen to match the repo's history
+(e.g. `feat:` for template changes in raptor-rust-template, `chore:` for tooling changes in the projects).
 
 Never create or modify anything on GitHub or other hosting services on my behalf: no PRs, issues, comments,
 reviews, releases, or advisories (`gh pr create`, `gh issue create`, `gh api` writes, …). Draft the text and give
