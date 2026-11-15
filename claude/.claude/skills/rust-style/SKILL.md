@@ -40,8 +40,9 @@ the scaffolding (Cargo.toml metadata and lints, CI workflows, CHANGELOG, README)
 ## Tooling
 
 - Every project uses workspace lints with all clippy groups enabled (`all`, `pedantic`, `nursery`, `cargo`,
-  `restriction`) plus the curated baseline allow list in [lints.md](lints.md), as in augur. If a project is missing
-  an entry from that list, point it out rather than silently adding it.
+  `restriction`) plus the curated baseline allow list in [lints.md](lints.md), as in augur, and the same setup for
+  Cargo's own lints (`[workspace.lints.cargo]`). If a project is missing an entry from those lists, point it out
+  rather than silently adding it.
 - Suppress a lint only when it genuinely can't be avoided (prefer restructuring), with
   `#[expect(clippy::lint_name, reason = "...")]` on the narrowest item, never `#[allow]`. The `reason` must hold at
   every site it covers; recheck it when that code changes. For lints clippy skips in test builds (e.g.,
@@ -50,12 +51,13 @@ the scaffolding (Cargo.toml metadata and lints, CI workflows, CHANGELOG, README)
 - Always pass `--locked` where supported. Before declaring work done, run:
   ```sh
   cargo fmt --all --check
-  cargo clippy --workspace --all-targets --locked -- -D warnings
+  CARGO_BUILD_WARNINGS=deny cargo clippy --workspace --all-targets --locked -- -D warnings
   RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
   cargo test --workspace --locked   # or the project's custom harness, e.g. `cargo test --test tests --locked`
   ```
   Keep `--workspace` (without it, a non-virtual workspace silently skips every crate but the root), and run any
-  extra CI steps (e.g., a WASM target build).
+  extra CI steps (e.g., a WASM target build). `-D warnings` doesn't reach Cargo's lints (e.g., an unused
+  dependency): `CARGO_BUILD_WARNINGS=deny` does, and CI's clippy step sets it too.
 - Optional extra checks: `cargo fmt -- --config imports_granularity=Module,group_imports=StdExternalCrate` and
   `cargo dylint --git https://github.com/xorpse/rust-style --pattern '*'` (`cargo install cargo-dylint dylint-link`).
   Ignore `thiserror_conventions`' constructor sub-rule, which conflicts with the error-handling rules below.

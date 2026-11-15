@@ -58,3 +58,27 @@ separated_literal_suffix = "allow"
 default_numeric_fallback = "allow"
 multiple_crate_versions = "allow"
 ```
+
+Cargo lints (Rust 1.100+; older Cargo only warns about an unused manifest key) follow the same pattern with the
+groups Cargo has: `default` is its `all` (`correctness`, `suspicious`, `style`), and it has no `nursery`, `cargo`,
+`complexity`, or `perf` (they are reported as unknown lints). Its `restriction` group contradicts itself, with both
+kebab-case and snake_case naming lints for packages and features: package names are kebab-case, so the snake_case
+lints are allowed. `-D warnings` doesn't reach these lints, so CI's clippy step sets `CARGO_BUILD_WARNINGS=deny`,
+which fails on Cargo lint and compiler warnings (not on Cargo's general warnings, such as ignored profiles):
+
+```toml
+[workspace.lints.cargo]
+default = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+restriction = { level = "warn", priority = -1 }
+# allow some lints
+non_snake_case_packages = "allow"
+non_snake_case_features = "allow"
+```
+
+```yaml
+      - name: clippy
+        env:
+          CARGO_BUILD_WARNINGS: deny
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+```
