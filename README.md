@@ -19,6 +19,7 @@ My dotfiles for Linux and macOS.
 My dotfiles are currently managed with [GNU Stow]. Each top-level directory represents a configuration package:
 
 - [**base16**](base16). Personalized color schemes based on [Tinted Theming].
+- [**cargo**](cargo). Configuration files for the [Cargo] Rust package manager.
 - [**claude**](claude). Configuration files for [Claude code].
 - [**container**](container). Configuration files for [Apple container] machines.
 - [**fish**](fish). Configuration files for the [fish] shell.
@@ -45,6 +46,13 @@ stow -vn base16 fish git nvim tmux x11 # dry run
 stow -v base16 fish git nvim tmux x11 # install packages
 ```
 
+Install the cargo package with `--no-folding`, so that stow doesn't turn a missing `~/.cargo` into a link into
+this repository, where rustup and cargo would then install their files:
+
+```sh
+stow -v --no-folding cargo
+```
+
 To uninstall a package use instead:
 
 ```sh
@@ -69,6 +77,7 @@ git push
 
 [GNU Stow]: https://www.gnu.org/software/stow/
 [Tinted Theming]: https://github.com/tinted-theming
+[Cargo]: https://doc.rust-lang.org/cargo/
 [Claude code]: https://claude.com/product/claude-code
 [Apple container]: https://github.com/apple/container
 [fish]: https://fishshell.com/

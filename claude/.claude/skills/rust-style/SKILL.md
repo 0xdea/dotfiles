@@ -29,6 +29,8 @@ the scaffolding (Cargo.toml metadata and lints, CI workflows, CHANGELOG, README)
    stable Rust release and edition. The rules below, the sources above, and existing project code capture idioms as
    they were when written; when any of them conflicts with a newer idiom (a new std API, language feature, edition
    change, or updated community consensus), prefer the current idiom and point out the outdated rule or code.
+   When adopting it would raise the project's `rust-version` (MSRV), it's the user's call, case by case: state the
+   version needed and any behavior difference, recommend, and ask.
 2. **When in doubt, ask the user.** If it's unclear which idiom is current, or a newer idiom conflicts with a rule
    below, a project's `CLAUDE.md`, or its lint configuration, explain the options and ask instead of guessing.
 3. **Then the project, then this guide.** Otherwise, the project's `CLAUDE.md` and `Cargo.toml` lint configuration
@@ -185,6 +187,9 @@ Close calls, decided this way:
   the format in the README. A library API is designed as such (e.g., returning results without printing them), not
   obtained by exporting CLI-oriented types. Every public error variant must be returnable by some public function,
   and a private helper that has one caller and only forwards to another function should be inlined.
+- A function that only returns on error (e.g., a loop ended by `process::exit`) returns `Result<!, E>` (Rust 1.100),
+  not `Result<(), E>`, so callers need no dead `Ok` arm: `let Err(err) = run(...);`. Changing a public function's
+  return type this way is breaking. Use `!` rather than `Infallible` (now its alias) in new code.
 - Don't store state in a field just to return it once. A method that updates state as it works (e.g., a set of
   processed items) takes `&mut self`, not a `RefCell`: `.map(|item| self.step(item)).sum()` still works.
 - One structure keyed by a composite or enum key over parallel structures dispatched by `match` (one
@@ -247,6 +252,9 @@ Close calls, decided this way:
   variants explicitly rather than with `_`.
 - Use `inspect_err` for cleanup on failure, and report (don't propagate) cleanup failures. Cleanup never deletes
   pre-existing data: create the output directory before, and outside, the path the cleanup covers.
+- For cleanup that must also run on early returns (`?`) and panics, use `core::mem::DropGuard` (Rust 1.100), with
+  `DropGuard::dismiss(guard)` on success, rather than a one-off guard struct or the `scopeguard` crate. A type that
+  owns a resource (a handle, a service) keeps its own `Drop` impl.
 
 ## Expressions and idioms
 
@@ -267,6 +275,9 @@ Close calls, decided this way:
 - Don't add fallbacks for cases an earlier check rules out; state the guarantee in a comment instead.
 - Shadow for a clear transformation of the same value (`let port = port.trim().parse::<u16>()?;`,
   `let mut buf = buf;`); never reuse a name for an unrelated value (`shadow_unrelated` stays enabled).
+- Remove an optional affix with `trim_prefix`/`trim_suffix` (Rust 1.100; on `str`, slices, and `Path`), not
+  `text.strip_prefix(affix).unwrap_or(text)`. Keep `strip_*` when presence matters (it returns an `Option`), and
+  `trim_*_matches` to remove every repetition (`trim_end_matches('/')` on a URL), not just one.
 - No sentinel values to force a code path (passing `BADADDR` to get `None`); express the `Option` flow directly.
 - At OS, FFI, and dependency boundaries, read what the code actually does rather than assuming (e.g., a zero
   `SO_RCVTIMEO` blocks forever; a function may return `Ok(())` without writing its output).
