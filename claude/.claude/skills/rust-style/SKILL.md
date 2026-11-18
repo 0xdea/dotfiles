@@ -331,8 +331,10 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   `Security`, one short imperative sentence each, code names in backticks. Prefix each breaking change to the public
   API with `**Breaking:**` (e.g., under `Changed` or `Removed`, as in haruspex); text changes such as lowercased
   error messages aren't breaking, and past releases aren't marked retroactively.
-- `Cargo.toml` has full metadata (authors, description, license, homepage, repository, keywords, categories); set
-  `documentation` only when docs.rs isn't suitable. Declare `rust-version` when anything needs a Rust newer than the
+- `Cargo.toml` has full metadata (authors, description, license, homepage, repository, documentation, keywords,
+  categories). Library crates set `documentation = "https://docs.rs/<crate>"` explicitly and show a doc badge in
+  the README (`[![doc](https://img.shields.io/docsrs/<crate>)](https://docs.rs/<crate>)`); binary-only crates have
+  neither, since docs.rs can't document them. Declare `rust-version` when anything needs a Rust newer than the
   edition's minimum (an API, a language feature such as `let` chains, or a dependency's own `rust-version`). Clippy's
   `incompatible_msrv` only checks APIs (it fires when set one version lower): confirm language features and
   dependencies by building with that toolchain.
