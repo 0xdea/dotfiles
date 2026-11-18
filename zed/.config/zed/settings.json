@@ -23,7 +23,7 @@
   },
   "preferred_line_length": 128,
   "soft_wrap": "bounded",
-  "diff_view_style": "split",
+  "diff_view_style": "unified",
   "use_smartcase_search": true,
   "inlay_hints": {
     "enabled": true,
