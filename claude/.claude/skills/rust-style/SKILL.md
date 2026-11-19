@@ -328,9 +328,12 @@ For projects built on idalib (augur, rhabdomancer, haruspex, idalib itself), als
   on every path that reaches the code.
 - `unsafe` blocks need a `// SAFETY:` comment (e.g., `env::set_var` in a single-threaded test binary).
 - `CHANGELOG.md` follows Keep a Changelog: entries under `[Unreleased]` in `Added`/`Changed`/`Fixed`/`Removed`/
-  `Security`, one short imperative sentence each, code names in backticks. Prefix each breaking change to the public
-  API with `**Breaking:**` (e.g., under `Changed` or `Removed`, as in haruspex); text changes such as lowercased
-  error messages aren't breaking, and past releases aren't marked retroactively.
+  `Security`, one short imperative sentence each, code names in backticks. Within each section, order entries by
+  importance to users rather than by date: changes to behavior and output first, then build and install
+  requirements (e.g., the MSRV), dependency and documentation updates, and internal changes (tests, CI, lints) last;
+  insert a new entry where it belongs instead of appending it. Prefix each breaking change to the public API with
+  `**Breaking:**` (e.g., under `Changed` or `Removed`, as in haruspex); text changes such as lowercased error
+  messages aren't breaking, and past releases aren't marked retroactively.
 - `Cargo.toml` has full metadata (authors, description, license, homepage, repository, documentation, keywords,
   categories). Library crates set `documentation = "https://docs.rs/<crate>"` explicitly and show a doc badge in
   the README (`[![doc](https://img.shields.io/docsrs/<crate>)](https://docs.rs/<crate>)`); binary-only crates have
