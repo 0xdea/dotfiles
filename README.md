@@ -20,6 +20,7 @@ My dotfiles are currently managed with [GNU Stow]. Each top-level directory repr
 - [**base16**](base16). Personalized color schemes based on [Tinted Theming].
 - [**cargo**](cargo). Configuration files for the [Cargo] Rust package manager.
 - [**claude**](claude). Configuration files for [Claude code].
+- [**claude-mac**](claude-mac). [Claude code] settings for macOS, not stowed by my dev containers.
 - [**container**](container). Configuration files for [Apple container] machines.
 - [**fish**](fish). Configuration files for the [fish] shell.
 - [**fonts**](fonts). The free and open source [JetBrains Mono] fonts.
@@ -50,6 +51,12 @@ this repository, where rustup and cargo would then install their files:
 
 ```sh
 stow -v --no-folding cargo
+```
+
+Install the claude packages the same way, so that they share the existing `~/.claude` directory file by file:
+
+```sh
+stow -v --no-folding claude claude-mac
 ```
 
 To uninstall a package use instead:
