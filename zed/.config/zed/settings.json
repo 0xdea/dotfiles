@@ -145,6 +145,9 @@
   },
   "agent_servers": {
     "claude-acp": {
+      "default_config_options": {
+        "mode": "default"
+      },
       "type": "registry",
     },
     "claude-agent-0.70.0": {
